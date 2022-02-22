@@ -14,18 +14,24 @@ struct CharInfo {
     var charId : Int
     var charName : String
     var charImage : Image
+    var description : String
+    var comics : ComicList
 }
 
 class CharactersViewController: UIViewController {
     
     @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet weak var toolBar: UIToolbar!
     
     var displayedCharsInfo = [CharInfo]()
     var marvelChars = [Character]()
+    var selectedCharacter : CharInfo?
+    var imageURL : URL?
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
         tableView.delegate = self
         tableView.dataSource = self
         getAllChars()
@@ -57,32 +63,34 @@ class CharactersViewController: UIViewController {
         var offset = 0
         var requestedCharacters = 0
         
-//        while (requestedCharacters <= totalCharacters) {
-            AF.request(url, parameters: parameters(limit: 30, offset: offset)).validate().responseDecodable(of: CharacterDataWrapper.self) { (response) in
-                guard let apiResponse = response.value?.data?.results
-                else {return}
-                
-                self.marvelChars.append(contentsOf: apiResponse)
-                
-                for (_,item) in self.marvelChars.enumerated() {
-                    
-                    var data = CharInfo(charId: item.id!, charName: item.name!, charImage: item.thumbnail!)
-                    
-                    self.displayedCharsInfo.append(data)
-                    
-                    print(data.charImage.url)
-                    
-                }
-             
-                self.tableView.reloadData()
-                
-//            }
-//            offset += 100
-//            requestedCharacters += 100
+        //        while (requestedCharacters <= totalCharacters) {
+        AF.request(url, parameters: parameters(limit: 30, offset: offset)).validate().responseDecodable(of: CharacterDataWrapper.self) { (response) in
+            guard let apiResponse = response.value?.data?.results
+            else {return}
             
-           
+            self.marvelChars.append(contentsOf: apiResponse)
+            
+            for (_,item) in self.marvelChars.enumerated() {
+                
+                var data = CharInfo(charId: item.id ?? 0 , charName: item.name ?? "", charImage: item.thumbnail!, description: item.description!, comics: item.comics!)
+                
+                
+                
+                self.displayedCharsInfo.append(data)
+                
+                print(data.charImage.url)
+                
+            }
+            
+            self.tableView.reloadData()
+            
+            //            }
+            //            offset += 100
+            //            requestedCharacters += 100
+            
+            
         }
-
+        
     }
     
 }
@@ -100,29 +108,51 @@ extension CharactersViewController: UITableViewDataSource {
         
         cell.charNameLabel.text = displayedCharsInfo[indexPath.row].charName
         
+        
         guard let imageURL = displayedCharsInfo[indexPath.row].charImage.url else { return cell }
         
         cell.charImageView.load(url: imageURL)
+        
         
         return cell
         
     }
     
     
-
+    
 }
 
 
 
-//MARK: - TV Delegate Methods
+//MARK: - Char TableView Delegate Methods
 
 extension CharactersViewController: UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        print(displayedCharsInfo[indexPath.row].charId)
-        return indexPath
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        tableView.deselectRow(at: indexPath, animated: true)
+        performSegue(withIdentifier: "segueForDetails", sender: self)
+      
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! DetailsViewController
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.charInfoForDetails = displayedCharsInfo[indexPath.row]
+            
+        }
+    }
+
+    
+ 
     
 }
+
+
+
+
+
+
 
