@@ -102,10 +102,20 @@ struct SeriesSummary : Codable  {
 }
 
 
+//extension Image {
+//    var url: URL? {
+//        if let path = path, let thumbnailExtension = imgExt  {
+//            return URL(string: "\(path.replacingOccurrences(of: "http", with: "https")).\(thumbnailExtension)")
+//        } else {
+//            return nil
+//        }
+//
+//    }
+//}
 extension Image {
-    var url: URL? {
+    var url: String? {
         if let path = path, let thumbnailExtension = imgExt  {
-            return URL(string: "\(path.replacingOccurrences(of: "http", with: "https")).\(thumbnailExtension)")
+            return "\(path.replacingOccurrences(of: "http", with: "https")).\(thumbnailExtension)"
         } else {
             return nil
         }

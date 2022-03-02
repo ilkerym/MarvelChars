@@ -14,7 +14,7 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var characterImageView: UIImageView!
     @IBOutlet weak var charNameLabel: UILabel!
     
-    var charInfoForDetails : CharInfo? = nil
+    var charInfoForDetails : CharInfoMain? = nil
     override func viewDidLoad() {
         super.viewDidLoad()
         

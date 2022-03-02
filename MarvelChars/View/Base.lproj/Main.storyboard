@@ -23,7 +23,7 @@
                                 </constraints>
                             </imageView>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="mQ8-fh-UWU">
-                                <rect key="frame" x="0.0" y="158" width="414" height="694"/>
+                                <rect key="frame" x="0.0" y="158" width="414" height="704"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cellIdentifier" rowHeight="83" id="bU9-mN-05L" customClass="CharacterTableViewCell" customModule="MarvelChars" customModuleProvider="target">
@@ -65,23 +65,14 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="u2V-P2-Oob">
-                                <rect key="frame" x="0.0" y="852" width="414" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items>
-                                    <barButtonItem title="Previous" width="207" id="LgW-kJ-Fqa"/>
-                                    <barButtonItem title="Next" width="207" id="00u-eA-7hK"/>
-                                </items>
-                            </toolbar>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="mQ8-fh-UWU" firstAttribute="top" secondItem="UyZ-ct-eFd" secondAttribute="bottom" id="5Em-rW-eqK"/>
                             <constraint firstItem="mQ8-fh-UWU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="CKd-UX-ueL"/>
-                            <constraint firstItem="u2V-P2-Oob" firstAttribute="top" secondItem="mQ8-fh-UWU" secondAttribute="bottom" id="Dhx-Am-Wd9"/>
-                            <constraint firstItem="u2V-P2-Oob" firstAttribute="centerX" secondItem="mQ8-fh-UWU" secondAttribute="centerX" id="OtF-T0-VwO"/>
                             <constraint firstItem="UyZ-ct-eFd" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Qgv-FH-2Rf"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="mQ8-fh-UWU" secondAttribute="bottom" id="aws-VM-A12"/>
                             <constraint firstAttribute="trailing" secondItem="mQ8-fh-UWU" secondAttribute="trailing" id="flR-90-AyV"/>
                             <constraint firstAttribute="trailing" secondItem="UyZ-ct-eFd" secondAttribute="trailing" id="gdK-Xn-cxm"/>
                             <constraint firstItem="UyZ-ct-eFd" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="qBN-eK-cLw"/>
@@ -90,7 +81,6 @@
                     <navigationItem key="navigationItem" id="Ink-e1-ulG"/>
                     <connections>
                         <outlet property="tableView" destination="mQ8-fh-UWU" id="2iU-ZE-NsN"/>
-                        <outlet property="toolBar" destination="u2V-P2-Oob" id="kV2-FY-J40"/>
                         <segue destination="3Nx-MA-hMe" kind="show" identifier="segueForDetails" id="WbD-2Q-JWA"/>
                     </connections>
                 </viewController>
@@ -126,14 +116,14 @@
                                 </constraints>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="detailCellIdenfier" id="YCU-H2-EA6" customClass="DetailsTableViewCell" customModule="MarvelChars" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="44.5" width="414" height="43"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="414" height="43.5"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="YCU-H2-EA6" id="RYa-p3-xJ4">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DE8-1C-itH">
-                                                    <rect key="frame" x="20" y="11" width="374" height="21"/>
+                                                    <rect key="frame" x="20" y="11" width="374" height="21.5"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>

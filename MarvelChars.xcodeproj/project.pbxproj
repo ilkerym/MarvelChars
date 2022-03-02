@@ -20,7 +20,7 @@
 		C2F3B74D27C01F1100AA64A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2F3B74C27C01F1100AA64A2 /* Assets.xcassets */; };
 		C2F3B75027C01F1100AA64A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C2F3B74E27C01F1100AA64A2 /* LaunchScreen.storyboard */; };
 		C2F3B75827C0313F00AA64A2 /* CharacterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75727C0313F00AA64A2 /* CharacterModel.swift */; };
-		C2F3B75C27C1322B00AA64A2 /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75B27C1322B00AA64A2 /* NetworkManager.swift */; };
+		C2F3B75C27C1322B00AA64A2 /* CharacterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75B27C1322B00AA64A2 /* CharacterManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,7 +41,7 @@
 		C2F3B74F27C01F1100AA64A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C2F3B75127C01F1100AA64A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2F3B75727C0313F00AA64A2 /* CharacterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterModel.swift; sourceTree = "<group>"; };
-		C2F3B75B27C1322B00AA64A2 /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
+		C2F3B75B27C1322B00AA64A2 /* CharacterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,19 +73,31 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		C2D1FEFA27C41BE800FF8F79 /* UI */ = {
+		C2B721B827CE78D3007174B1 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C2F3B75727C0313F00AA64A2 /* CharacterModel.swift */,
+				C2F3B75B27C1322B00AA64A2 /* CharacterManager.swift */,
 				C2D1FEFB27C41C0800FF8F79 /* UIExtensions.swift */,
 			);
-			path = UI;
+			path = Model;
+			sourceTree = "<group>";
+		};
+		C2B721B927CEB55E007174B1 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				C2F3B74627C01F1100AA64A2 /* Main.storyboard */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		C2D1FEFF27C4934A00FF8F79 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				C2F3B74427C01F1100AA64A2 /* CharactersViewController.swift */,
+				C2D1FEF827C4161600FF8F79 /* CharacterTableViewCell.swift */,
 				C2D1FEFD27C4934000FF8F79 /* DetailsViewController.swift */,
+				C2D1FF0027C4985D00FF8F79 /* DetailsTableViewCell.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -114,13 +126,9 @@
 				C2F3B74027C01F1100AA64A2 /* AppDelegate.swift */,
 				C2F3B74227C01F1100AA64A2 /* SceneDelegate.swift */,
 				C2D1FEFF27C4934A00FF8F79 /* Controllers */,
-				C2F3B75727C0313F00AA64A2 /* CharacterModel.swift */,
-				C2F3B75B27C1322B00AA64A2 /* NetworkManager.swift */,
-				C2D1FEFA27C41BE800FF8F79 /* UI */,
-				C2F3B74627C01F1100AA64A2 /* Main.storyboard */,
+				C2B721B827CE78D3007174B1 /* Model */,
+				C2B721B927CEB55E007174B1 /* View */,
 				C2F3B74C27C01F1100AA64A2 /* Assets.xcassets */,
-				C2D1FEF827C4161600FF8F79 /* CharacterTableViewCell.swift */,
-				C2D1FF0027C4985D00FF8F79 /* DetailsTableViewCell.swift */,
 				C2F3B74E27C01F1100AA64A2 /* LaunchScreen.storyboard */,
 				C2F3B75127C01F1100AA64A2 /* Info.plist */,
 				C2F3B74927C01F1100AA64A2 /* MarvelChars.xcdatamodeld */,
@@ -249,7 +257,7 @@
 				C2F3B74527C01F1100AA64A2 /* CharactersViewController.swift in Sources */,
 				C2D1FEFC27C41C0800FF8F79 /* UIExtensions.swift in Sources */,
 				C2F3B75827C0313F00AA64A2 /* CharacterModel.swift in Sources */,
-				C2F3B75C27C1322B00AA64A2 /* NetworkManager.swift in Sources */,
+				C2F3B75C27C1322B00AA64A2 /* CharacterManager.swift in Sources */,
 				C2F3B74127C01F1100AA64A2 /* AppDelegate.swift in Sources */,
 				C2D1FF0127C4985D00FF8F79 /* DetailsTableViewCell.swift in Sources */,
 				C2F3B74327C01F1100AA64A2 /* SceneDelegate.swift in Sources */,
