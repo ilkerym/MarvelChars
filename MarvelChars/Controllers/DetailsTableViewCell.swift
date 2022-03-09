@@ -21,5 +21,16 @@ class DetailsTableViewCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
+    
+    func configureDetailCell(with selectedRow: ComicSummary) {
+        if selectedRow.name != nil {
+            comicsLabel.text = selectedRow.name
+        } else {
+            comicsLabel.text = "No Comics List Available"
+        }
+        
+        
+        
+    }
+    
 }

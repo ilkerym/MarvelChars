@@ -101,17 +101,17 @@ struct SeriesSummary : Codable  {
     let name: String? //(string, optional): The canonical name of the series.
 }
 
+extension ComicList {
+    var urlComics: String? {
+        if let path = collectionURI   {
+            return "\(path.replacingOccurrences(of: "http", with: "https"))"
+        } else {
+            return nil
+        }
+    }
+}
 
-//extension Image {
-//    var url: URL? {
-//        if let path = path, let thumbnailExtension = imgExt  {
-//            return URL(string: "\(path.replacingOccurrences(of: "http", with: "https")).\(thumbnailExtension)")
-//        } else {
-//            return nil
-//        }
-//
-//    }
-//}
+
 extension Image {
     var url: String? {
         if let path = path, let thumbnailExtension = imgExt  {
