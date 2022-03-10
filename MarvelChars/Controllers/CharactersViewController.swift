@@ -16,22 +16,23 @@ class CharactersViewController: UIViewController {
     private let previousPageButton = UIButton()
     private let nextPageButton = UIButton()
     private let footerView = UIView()
-    private let networkRequest = NetworkRequest()
+    private var networkRequest = NetworkRequest()
     var character = [Character]()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         // assigning protocols to ViewController
         tableView.dataSource = self
         tableView.delegate = self
         
-        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { result in
+        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { [weak self] result in
             switch result {
             case .failure(let error):
                 print(error.localizedDescription)
             case.success(let data):
-                self.character = data as! [Character]
-                self.tableView.reloadData()
+                self?.character = data as! [Character]
+                self?.tableView.reloadData()
             }
             
         }
@@ -72,50 +73,32 @@ class CharactersViewController: UIViewController {
     //MARK: - Button Actions for TableView's FooterView
     
     @objc func nextTapped() {
-        
-        character = []
-        networkRequest.offsetValue += 30
+        networkRequest.offsetValue += 100
         print("limit value ->\(networkRequest.limitValue)\toffsetvalue ->\(networkRequest.offsetValue)")
-        
-        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { result in
-            
-            
-            switch result {
-            case .failure(let err):
-                print(err.localizedDescription)
-            case.success(let data):
-                self.character = data as! [Character]
-                self.tableView.reloadData()
-            }
-            self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-            
-        }
-        
-        
+        anotherPage()
     }
-    
     @objc func previousTapped() {
         if networkRequest.offsetValue <= 0 {
             previousPageButton.isSelected = false
             return
-            
         } else {
-            character = []
-            networkRequest.offsetValue -= 30
-            
-            networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { result in
-                switch result {
-                case .failure(let err):
-                    print(err.localizedDescription)
-                case.success(let data):
-                    self.character = data as! [Character]
-                    
-                    self.tableView.reloadData()
-                }
-                self.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)            }
+            networkRequest.offsetValue -= 100
+            anotherPage()
         }
-        
-        
+    }
+    private func anotherPage() {
+        character = []
+        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { [weak self] result in
+            switch result {
+            case .failure(let err):
+                print(err.localizedDescription)
+            case.success(let data):
+                self?.character = data as! [Character]
+                self?.tableView.reloadData()
+            }
+            self?.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+            
+        }
     }
 }
 

@@ -30,9 +30,12 @@ class DetailsViewController: UIViewController {
         detailsTableView.dataSource = self
         detailsTableView.delegate = self
         
+        
+        
+        
         if let marvelCharacter = selectedCharacter {
             charNameLabel.text = marvelCharacter.name
-            
+            navigationItem.title = "Details"
             if marvelCharacter.description == "" {
                 charDescriptionLabel.text = "No Available Description"
             } else {
@@ -40,7 +43,10 @@ class DetailsViewController: UIViewController {
             }
             
         }
+        
         characterImageView.image = charImage
+        
+     
         
         
 //        let formatter = DateFormatter()
@@ -48,9 +54,11 @@ class DetailsViewController: UIViewController {
 //        let year2005 = formatter.date(from: "2005/01/01 00:00")
 //        let ts2 = String(Date().timeIntervalSince(year2005!))
         
-        self.detailsTableView.reloadData()
+       
 
         }
+    
+   
 
 }
 extension DetailsViewController: UITableViewDataSource {

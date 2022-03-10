@@ -13,7 +13,7 @@ class NetworkRequest {
     
     let url = "https://gateway.marvel.com:443/v1/public/characters"
     let ts = String(Date().timeIntervalSince1970)
-    var limitValue = 30
+    var limitValue = 100
     var offsetValue = 0
     
     func MD5(data: String) -> String {
@@ -28,7 +28,7 @@ class NetworkRequest {
     }
     func fetchAllChars(with input : [String: Any], completion: @escaping (Result<Any, AFError>) -> Void) {
         
-        AF.request(url, parameters: getParameters(limit: limitValue, offset: offsetValue, ts: ts)).validate().responseDecodable(of: CharacterDataWrapper.self) { (response) in
+        AF.request(url, parameters: getParameters(limit: limitValue, offset: offsetValue, ts: ts)).validate().responseDecodable(of: CharacterDataWrapper.self) { response in
             
             switch response.result {
                 

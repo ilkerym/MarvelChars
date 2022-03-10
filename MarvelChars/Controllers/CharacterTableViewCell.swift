@@ -19,7 +19,7 @@ class CharacterTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        
+        charImageView.layer.cornerRadius = charImageView.frame.size.height/10
         
     }
     

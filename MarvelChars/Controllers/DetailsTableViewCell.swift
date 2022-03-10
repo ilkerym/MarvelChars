@@ -28,9 +28,7 @@ class DetailsTableViewCell: UITableViewCell {
         } else {
             comicsLabel.text = "No Comics List Available"
         }
-        
-        
-        
+ 
     }
     
 }
