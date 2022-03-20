@@ -7,103 +7,87 @@
 
 import UIKit
 import Alamofire
-import SDWebImage
+import AlamofireImage
 import CryptoKit
 
-class CharactersViewController: UIViewController {
+class CharactersViewController: UIViewController{
     
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var tableView: UITableView!
-    private let previousPageButton = UIButton()
-    private let nextPageButton = UIButton()
-    private let footerView = UIView()
-    private var networkRequest = NetworkRequest()
-    var character = [Character]()
-
+    private let apiRequest = APIRequest(offset: 0)
+    private var character = [Character]()
+    private let alert = UIAlertController(title: "Please wait", message: "Loading Characters", preferredStyle: .alert)
+    
+   private var totalChar = Int()
+   private var callCount = Int()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // assigning protocols to ViewController
+        tableView.register(CharacterTableViewCell.self, forCellReuseIdentifier: "cell")
+        
+        // assigns protocols to ViewController
         tableView.dataSource = self
         tableView.delegate = self
         
-        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { [weak self] result in
-            switch result {
-            case .failure(let error):
-                print(error.localizedDescription)
-            case.success(let data):
-                self?.character = data as! [Character]
-                self?.tableView.reloadData()
+        DispatchQueue.main.async {
+            self.present(self.alert, animated: true, completion: nil)
+            self.activityIndicator.startAnimating()
+            
+        }
+        
+        networkRequest()
+        
+    }
+    
+    
+    private func networkRequest() {
+        apiRequest.fetchDataWrapper(with: apiRequest.parameters) { [self] response in
+            
+            guard let data = response.data else {return print("error while getting Wrapper")}
+            
+            callCount = data.count!   // The total number of results returned by this call
+            totalChar = data.total!   // The total number of Characters
+           
+            for offset in stride(from:0, through: totalChar, by: 100) {
+                
+                let request = APIRequest(offset: offset)
+                
+                request.fetchDataWrapper(with: request.parameters) {  response in
+                    
+                    guard let data = response.data else {return print("error while getting Wrapper") }
+                    
+                    let newCharacters = data.results!
+                    print(newCharacters.last?.name! as Any)
+                    self.character.append(contentsOf: newCharacters)
+                    
+                    if character.count == totalChar {
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                            alert.dismiss(animated: true, completion: nil)
+                            activityIndicator.stopAnimating() // stop animating after getting characters
+                            activityIndicator.hidesWhenStopped = true
+                        }
+                    }
+                }
+                
             }
             
         }
         
     }
+    
+    
     
     override func viewWillAppear(_ animated: Bool) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.addFooterToTableView()
-        }
+        
         
     }
     
-    //MARK: - Adding footer to tableView
-    
-    private func addFooterToTableView () {
-        
-        // FooterView Configuration
-        footerView.frame = CGRect(x: 0, y: 0, width:tableView.frame.size.width, height: 50)
-        footerView.backgroundColor = .black
-        
-        // Previous Page button configuration
-        previousPageButton.frame = CGRect(x: 0, y: 0, width: footerView.frame.size.width/2, height: 50)
-        previousPageButton.setTitle("Previous", for: .normal)
-        previousPageButton.addTarget(self, action: #selector(previousTapped), for: .touchUpInside)
-        
-        // Next Page button configuration
-        nextPageButton.frame = CGRect(x: footerView.frame.size.width/2, y: 0, width: footerView.frame.size.width/2, height: 50)
-        nextPageButton.setTitle("Next", for: .normal)
-        nextPageButton.addTarget(self, action: #selector(nextTapped), for: .touchUpInside)
-        
-        footerView.addSubview(nextPageButton)
-        footerView.addSubview(previousPageButton)
-        
-        tableView.tableFooterView = footerView
-        
-    }
-    //MARK: - Button Actions for TableView's FooterView
-    
-    @objc func nextTapped() {
-        networkRequest.offsetValue += 100
-        print("limit value ->\(networkRequest.limitValue)\toffsetvalue ->\(networkRequest.offsetValue)")
-        anotherPage()
-    }
-    @objc func previousTapped() {
-        if networkRequest.offsetValue <= 0 {
-            previousPageButton.isSelected = false
-            return
-        } else {
-            networkRequest.offsetValue -= 100
-            anotherPage()
-        }
-    }
-    private func anotherPage() {
-        character = []
-        networkRequest.fetchAllChars(with: networkRequest.getParameters(limit: networkRequest.limitValue, offset: networkRequest.offsetValue, ts: networkRequest.ts)) { [weak self] result in
-            switch result {
-            case .failure(let err):
-                print(err.localizedDescription)
-            case.success(let data):
-                self?.character = data as! [Character]
-                self?.tableView.reloadData()
-            }
-            self?.tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
-            
-        }
-    }
 }
 
-
-//MARK: - TableView Data Source Methods
+// MARK: - TableView Data Source Methods
 
 extension CharactersViewController: UITableViewDataSource {
     
@@ -114,11 +98,11 @@ extension CharactersViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellIdentifier", for: indexPath) as! CharacterTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CharacterTableViewCell
         
         let selectedRow = character[indexPath.row]
         
-        cell.configureCell(with: selectedRow)
+        cell.character = selectedRow
         
         return cell
         
@@ -133,19 +117,34 @@ extension CharactersViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        guard let cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {return}
+        guard  let  cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {return}
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
+        print(character[indexPath.row].comics?.urlComics as Any)
         if let summmary = character[indexPath.row].comics?.items {
             destinationVC.comicsSummary = summmary
         }
-        
+        destinationVC.charLargeImage = cell.charImage
         destinationVC.selectedCharacter = character[indexPath.row]
-        destinationVC.charImage = cell.charImageView.image
-        
         navigationController?.pushViewController(destinationVC, animated: true)
         
     }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 85
+    }
+    
+    
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        
+    }
+    
+    func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
+        
+        
+        
+    }
+    
     
 }
 

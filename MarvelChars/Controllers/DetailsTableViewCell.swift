@@ -8,27 +8,39 @@
 import UIKit
 
 class DetailsTableViewCell: UITableViewCell {
-
+    
     @IBOutlet weak var comicsLabel: UILabel!
+    
+    var comicName = String()
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
     }
-
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-
+        
         // Configure the view for the selected state
     }
     
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
+        
+        var content = defaultContentConfiguration()
+        
+        content.text = comicName
+        
+        
+        contentConfiguration = content
+        
+        
+    }
+    
     func configureDetailCell(with selectedRow: ComicSummary) {
-        if selectedRow.name != nil {
-            comicsLabel.text = selectedRow.name
-        } else {
-            comicsLabel.text = "No Comics List Available"
-        }
- 
+        
+        
     }
     
 }

@@ -1,25 +1,25 @@
 //
-//  MyTableViewCell.swift
+//  CharacterTableViewCell.swift
 //  MarvelChars
 //
-//  Created by İlker Yasin Memişoğlu on 21.02.2022.
+//  Created by İlker Yasin Memişoğlu on 14.03.2022.
 //
 
 import UIKit
 import Alamofire
-import SDWebImage
+import AlamofireImage
+
 
 
 class CharacterTableViewCell: UITableViewCell {
     
-    @IBOutlet weak var charImageView: UIImageView!
-    @IBOutlet weak var charNameLabel: UILabel!
     
+    var character : Character?
+    var charImage = UIImage()
     
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
-        charImageView.layer.cornerRadius = charImageView.frame.size.height/10
         
     }
     
@@ -30,26 +30,66 @@ class CharacterTableViewCell: UITableViewCell {
     }
     
     
-    func configureCell(with selectedRow: Character) {
+    
+    override func updateConfiguration(using state: UICellConfigurationState) {
+        super.updateConfiguration(using: state)
         
-        // get the name of label
-        charNameLabel.text = selectedRow.name
-        
-        // get the images of Chars
-        
-        
-        //        let scale = UIScreen.main.scale // Will be 2.0 on 6/7/8 and 3.0 on 6+/7+/8+ or later
-        //        let thumbnailSize = CGSize(width: 83 * scale, height: 83 * scale) // Thumbnail will bounds to (83,83) points
-        //        self.charImageView.sd_setImage(with: URL(string: selectedRow.charImage.url ?? "No Available Image") , placeholderImage: nil, context: [.imageThumbnailPixelSize : thumbnailSize])
-        
-        
-        // Here we use the new provided sd_setImageWithURL: method to load the web image
-        charImageView.sd_setImage(
-            with: URL(string: selectedRow.thumbnail?.url ?? "No Available Url")!,
-            placeholderImage: UIImage(named: "placeholder")
-        )
-        
+       
+        if let character = character {
+
+            // Image Response Serializers
+            AF.request(String((character.thumbnail?.url)!)).responseImage { response in
+                
+                guard let data = response.data else {return print("error while fetching character image")}
+               
+                self.charImage = UIImage(data: data) ?? UIImage(systemName: "pencil")!
+                
+                //apply image filter
+                let size = CGSize(width: 85.0, height: 85.0)
+                
+                let imageFilter = AspectScaledToFillSizeWithRoundedCornersFilter(size: size, radius: 5)
+               
+                let filteredCharImage = imageFilter.filter(self.charImage)
+                
+                var content = self.defaultContentConfiguration().updated(for: state)
+
+                content.image = filteredCharImage
+                
+                content.text = character.name
+                
+                self.contentConfiguration = content
+                
+                
+                
+            }
+        }
+   
     }
+    
+  
     
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

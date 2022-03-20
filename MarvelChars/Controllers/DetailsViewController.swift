@@ -7,7 +7,7 @@
 
 import UIKit
 import Alamofire
-import SDWebImage
+
 
 class DetailsViewController: UIViewController {
     
@@ -21,16 +21,14 @@ class DetailsViewController: UIViewController {
     var selectedCharacter : Character?
     var comicsSummary = [ComicSummary]()
     var comicsSum : ComicSummary?
-    var charImage: UIImage?
+    var charLargeImage: UIImage?
     
-   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         detailsTableView.dataSource = self
         detailsTableView.delegate = self
-        
-        
         
         
         if let marvelCharacter = selectedCharacter {
@@ -44,56 +42,38 @@ class DetailsViewController: UIViewController {
             
         }
         
-        characterImageView.image = charImage
+        characterImageView.image = charLargeImage
         
-     
-        
-        
-//        let formatter = DateFormatter()
-//        formatter.dateFormat = "yyyy/MM/dd HH:mm"
-//        let year2005 = formatter.date(from: "2005/01/01 00:00")
-//        let ts2 = String(Date().timeIntervalSince(year2005!))
-        
-       
-
-        }
+    }
     
-   
-
 }
+
 extension DetailsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        if comicsSummary.count == 1 {
-            return 1
-        } else {
-            return comicsSummary.count
-        }
-        
-        
+        return comicsSummary.isEmpty ? 1 : comicsSummary.count
     }
-
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = detailsTableView.dequeueReusableCell(withIdentifier: "detailCell") as! DetailsTableViewCell
         
-        let selectedRow = comicsSummary[indexPath.row]
+        if comicsSummary.isEmpty {
+            cell.comicName = "No Available Comic"
+        } else {
+            let selectedRow = comicsSummary[indexPath.row]
+            cell.comicName = selectedRow.name!
+        }
         
-        cell.configureDetailCell(with: selectedRow)
-
         return cell
     }
-    
-    
-    
-    
     
 }
 extension DetailsViewController: UITableViewDelegate {
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        detailsTableView.deselectRow(at: indexPath, animated: true)
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        // to make tableview cells non-selectable
+        return nil
     }
-
 }
 
 
