@@ -10,17 +10,17 @@ import Alamofire
 import AlamofireImage
 import CryptoKit
 
+
 class CharactersViewController: UIViewController{
-    
-    
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    // outlet definitions
     @IBOutlet weak var tableView: UITableView!
-    private let apiRequest = APIRequest(offset: 0)
-    private var character = [Character]()
-    private let alert = UIAlertController(title: "Please wait", message: "Loading Characters", preferredStyle: .alert)
     
-   private var totalChar = Int()
-   private var callCount = Int()
+    //parameter definitions
+    private var character = [Character]()
+    private var totalChar = Int(), callCount = Int()
+    private let apiRequest = APIRequest(offset: 0), newCharRequest = APIRequest(offset: 30)
+    private let activityIndicator = UIActivityIndicatorView()
+    private var isPaginating = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,59 +30,52 @@ class CharactersViewController: UIViewController{
         // assigns protocols to ViewController
         tableView.dataSource = self
         tableView.delegate = self
-        
-        DispatchQueue.main.async {
-            self.present(self.alert, animated: true, completion: nil)
-            self.activityIndicator.startAnimating()
-            
-        }
-        
-        networkRequest()
+        // initialize UI
+        showSpinner()
+        networkRequest(pagination: false)
         
     }
+    // spinner functions
+    private func showSpinner() {
+        activityIndicator.frame = self.view.bounds
+        activityIndicator.style = .large
+        activityIndicator.color = .black
+        activityIndicator.center = view.center
+        activityIndicator.startAnimating()
+        view.addSubview(activityIndicator)
+        
+        
+    }
+    private func removeSpinner() {
+        activityIndicator.stopAnimating()
+        activityIndicator.removeFromSuperview()
+    }
     
-    
-    private func networkRequest() {
-        apiRequest.fetchDataWrapper(with: apiRequest.parameters) { [self] response in
-            
-            guard let data = response.data else {return print("error while getting Wrapper")}
-            
-            callCount = data.count!   // The total number of results returned by this call
-            totalChar = data.total!   // The total number of Characters
-           
-            for offset in stride(from:0, through: totalChar, by: 100) {
-                
-                let request = APIRequest(offset: offset)
-                
-                request.fetchDataWrapper(with: request.parameters) {  response in
-                    
-                    guard let data = response.data else {return print("error while getting Wrapper") }
-                    
-                    let newCharacters = data.results!
-                    print(newCharacters.last?.name! as Any)
-                    self.character.append(contentsOf: newCharacters)
-                    
-                    if character.count == totalChar {
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                            alert.dismiss(animated: true, completion: nil)
-                            activityIndicator.stopAnimating() // stop animating after getting characters
-                            activityIndicator.hidesWhenStopped = true
-                        }
-                    }
-                }
-                
+    // API request function
+    private func networkRequest(pagination: Bool) {
+        
+        if pagination  {
+            if pagination {
+                isPaginating = true
             }
-            
+            newCharRequest.fetchDataWrapper(with: newCharRequest.parameters) { response in
+                self.character.append(contentsOf: response)
+                self.isPaginating = false
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+            }
         }
-        
-    }
-    
-    
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        
+        else {
+            apiRequest.fetchDataWrapper(with: apiRequest.parameters) { response in
+                self.character.append(contentsOf: response)
+                DispatchQueue.main.async {
+                    self.removeSpinner()
+                    self.tableView.reloadData()
+                }
+            }
+        }
+
     }
     
 }
@@ -120,7 +113,7 @@ extension CharactersViewController: UITableViewDelegate {
         guard  let  cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {return}
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
-        print(character[indexPath.row].comics?.urlComics as Any)
+        
         if let summmary = character[indexPath.row].comics?.items {
             destinationVC.comicsSummary = summmary
         }
@@ -136,14 +129,39 @@ extension CharactersViewController: UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        
+        let lastSectionIndex = tableView.numberOfSections - 1
+        let lastRowIndex = tableView.numberOfRows(inSection: lastSectionIndex) - 1
+        if (indexPath.section ==  lastSectionIndex) && (indexPath.row == lastRowIndex) {
+           
+            let spinner = UIActivityIndicatorView(style: .medium)
+            spinner.startAnimating()
+            spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
+            
+            tableView.tableFooterView = spinner
+            tableView.tableFooterView?.isHidden = false
+            
+        }
     }
     
-    func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
-        
-        
-        
+    
+}
+//MARK: - ScrollView Delegate
+extension CharactersViewController: UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let position = scrollView.contentOffset.y
+        if position > (tableView.contentSize.height - 50 - scrollView.frame.size.height) {
+            
+            guard !isPaginating else {
+                // already fethcing data
+                
+                return
+            }
+            networkRequest(pagination: true)
+            
+        }
     }
+    
     
     
 }

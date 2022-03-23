@@ -32,15 +32,9 @@ class DetailsTableViewCell: UITableViewCell {
         
         content.text = comicName
         
-        
         contentConfiguration = content
-        
         
     }
     
-    func configureDetailCell(with selectedRow: ComicSummary) {
-        
-        
-    }
     
 }

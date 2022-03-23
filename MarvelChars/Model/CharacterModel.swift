@@ -132,14 +132,14 @@ extension Character {
         thumbnail = try values.decode(Image?.self, forKey: .thumbnail)
         comics = try values.decode(ComicList?.self, forKey: .comics)
         urls = try values.decode([Url]? .self, forKey: .urls)
-
+        
     }
-
+    
 }
 extension Image {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         path = try values.decode(String?.self, forKey: .path)
         imgExt = try values.decode(String?.self, forKey: .imgExt)
-}
+    }
 }

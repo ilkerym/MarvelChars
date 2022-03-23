@@ -11,26 +11,28 @@ import Alamofire
 
 class DetailsViewController: UIViewController {
     
-    
+    // outlet definitions
     @IBOutlet weak var detailsTableView: UITableView!
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var charDescriptionLabel: UILabel!
     @IBOutlet weak var characterImageView: UIImageView!
     @IBOutlet weak var charNameLabel: UILabel!
-    
+    // other parameters definitions
+    var charLargeImage: UIImage?
     var selectedCharacter : Character?
     var comicsSummary = [ComicSummary]()
-    var comicsSum : ComicSummary?
-    var charLargeImage: UIImage?
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // assign protocols to controller
         detailsTableView.dataSource = self
         detailsTableView.delegate = self
         
+        initializeUI()
         
+    }
+    
+    private func initializeUI() {
         if let marvelCharacter = selectedCharacter {
             charNameLabel.text = marvelCharacter.name
             navigationItem.title = "Details"
@@ -48,6 +50,7 @@ class DetailsViewController: UIViewController {
     
 }
 
+// MARK: - Details Table View Data Source Method
 extension DetailsViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
@@ -68,6 +71,8 @@ extension DetailsViewController: UITableViewDataSource {
     }
     
 }
+
+// MARK: - Details Table View Delegate Methods
 extension DetailsViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
