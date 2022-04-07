@@ -9,6 +9,7 @@ import Foundation
 import Alamofire
 
 
+
 struct CharacterDataWrapper: Codable {
     let code : Int? //The HTTP status code of the returned result.,
     let status : String? //(string, optional): A string description of the call status.,
@@ -25,7 +26,7 @@ struct CharacterDataContainer : Codable {
     let count: Int? //(int, optional): The total number of results returned by this call.,
     let results: [Character]? //(Array[Character], optional): The list of characters returned by the call.
 }
-struct Character : Codable {
+struct Character : Codable{
     var id: Int? // (int, optional): The unique ID of the character resource.,
     var name: String? // (string, optional): The name of the character.,
     var description: String? // (string, optional): A short bio or description of the character.,
@@ -143,3 +144,14 @@ extension Image {
         imgExt = try values.decode(String?.self, forKey: .imgExt)
     }
 }
+
+extension Character : Equatable {
+    static func == (lhs: Character, rhs: Character) -> Bool {
+        return lhs.name == rhs.name
+        
+    }
+  
+}
+
+
+

@@ -23,8 +23,12 @@
                                     <constraint firstAttribute="height" constant="50" id="RYf-n2-Htb"/>
                                 </constraints>
                             </imageView>
+                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="i2j-qS-g8z">
+                                <rect key="frame" x="0.0" y="138" width="414" height="51"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="mQ8-fh-UWU">
-                                <rect key="frame" x="0.0" y="138" width="414" height="724"/>
+                                <rect key="frame" x="0.0" y="233" width="414" height="629"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="rZy-Vf-bOf" customClass="CharacterTableViewCell" customModule="MarvelChars" customModuleProvider="target">
@@ -37,15 +41,48 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="F6W-Md-G5v">
+                                <rect key="frame" x="0.0" y="189" width="414" height="44"/>
+                                <subviews>
+                                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BT5-28-CRD">
+                                        <rect key="frame" x="357" y="6.5" width="51" height="31"/>
+                                        <connections>
+                                            <action selector="favoriteSwitchToggled:" destination="BYZ-38-t0r" eventType="valueChanged" id="fXY-1i-BNc"/>
+                                        </connections>
+                                    </switch>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Favorite Characters" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qGO-g8-riX">
+                                        <rect key="frame" x="8" y="12" width="148.5" height="20.5"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="BT5-28-CRD" secondAttribute="trailing" constant="8" id="S77-1P-XWT"/>
+                                    <constraint firstItem="BT5-28-CRD" firstAttribute="centerY" secondItem="F6W-Md-G5v" secondAttribute="centerY" id="X6e-Qk-dx2"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="qGO-g8-riX" secondAttribute="trailing" constant="20" symbolic="YES" id="XDZ-c0-mnC"/>
+                                    <constraint firstItem="qGO-g8-riX" firstAttribute="leading" secondItem="F6W-Md-G5v" secondAttribute="leading" constant="8" id="cZg-u1-yGt"/>
+                                    <constraint firstAttribute="height" constant="44" id="iF2-li-gP6"/>
+                                    <constraint firstItem="qGO-g8-riX" firstAttribute="centerY" secondItem="F6W-Md-G5v" secondAttribute="centerY" id="ji5-u8-3NA"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <constraints>
-                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="top" secondItem="UyZ-ct-eFd" secondAttribute="bottom" id="5Em-rW-eqK"/>
-                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="CKd-UX-ueL"/>
+                            <constraint firstItem="F6W-Md-G5v" firstAttribute="top" secondItem="i2j-qS-g8z" secondAttribute="bottom" id="0hg-7M-Bot"/>
+                            <constraint firstItem="F6W-Md-G5v" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="1rX-at-NzC"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="F6W-Md-G5v" secondAttribute="trailing" id="5wU-Gu-gdR"/>
+                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="top" secondItem="F6W-Md-G5v" secondAttribute="bottom" id="6DT-G4-pEV"/>
+                            <constraint firstItem="i2j-qS-g8z" firstAttribute="top" secondItem="UyZ-ct-eFd" secondAttribute="bottom" id="B8p-AI-ezd"/>
+                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="D7s-MD-VJQ"/>
+                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="MKd-Cs-maj"/>
                             <constraint firstItem="UyZ-ct-eFd" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Qgv-FH-2Rf"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="mQ8-fh-UWU" secondAttribute="bottom" id="aws-VM-A12"/>
-                            <constraint firstAttribute="trailing" secondItem="mQ8-fh-UWU" secondAttribute="trailing" id="flR-90-AyV"/>
+                            <constraint firstItem="F6W-Md-G5v" firstAttribute="top" secondItem="i2j-qS-g8z" secondAttribute="bottom" id="RVj-DE-DHJ"/>
+                            <constraint firstItem="i2j-qS-g8z" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="YT3-5W-46c"/>
+                            <constraint firstItem="mQ8-fh-UWU" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="d1H-H2-pU6"/>
                             <constraint firstAttribute="trailing" secondItem="UyZ-ct-eFd" secondAttribute="trailing" id="gdK-Xn-cxm"/>
+                            <constraint firstItem="i2j-qS-g8z" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="jXq-gZ-KNJ"/>
                             <constraint firstItem="UyZ-ct-eFd" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="qBN-eK-cLw"/>
                         </constraints>
                     </view>
@@ -55,6 +92,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="favoriteSwitch" destination="BT5-28-CRD" id="UH8-TL-xcn"/>
                         <outlet property="tableView" destination="mQ8-fh-UWU" id="2iU-ZE-NsN"/>
                     </connections>
                 </viewController>

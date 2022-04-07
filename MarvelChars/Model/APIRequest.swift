@@ -8,7 +8,6 @@
 import UIKit
 import Alamofire
 import CryptoKit
-import SwiftUI
 
 final class APIRequest {
     

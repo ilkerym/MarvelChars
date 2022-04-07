@@ -8,37 +8,43 @@
 import UIKit
 import Alamofire
 import AlamofireImage
+import SystemConfiguration
 
-
+protocol CharacterCellDelegate {
+    func accessoryViewDidTapped(cell: CharacterTableViewCell, isStarred: Bool)
+    func cellDidTapped(cell: CharacterTableViewCell)
+}
 
 class CharacterTableViewCell: UITableViewCell {
     
     
-    var character : Character?
+    var delegate: CharacterCellDelegate?
+    var characterManager : CharacterManager?
     var charImage = UIImage()
+    var accessoryIsTapped  = false
+    var favoriteButton = UIButton(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
+    var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 25 , height: 25))
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-        
+    let starImage = UIImage(named: "star")
+    let starFillImage = UIImage(named: "star.fill")
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+ 
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        
-        // Configure the view for the selected state
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
-    
-    
-    
+
     override func updateConfiguration(using state: UICellConfigurationState) {
         super.updateConfiguration(using: state)
         
        
-        if let character = character {
+        if let character = characterManager {
 
             // Image Response Serializers
-            AF.request(String((character.thumbnail?.url)!)).responseImage { response in
+            AF.request(String((characterManager?.character.thumbnail?.url)!)).responseImage { response in
                 
                 guard let data = response.data else {return print("error while fetching character image")}
                
@@ -55,20 +61,39 @@ class CharacterTableViewCell: UITableViewCell {
 
                 content.image = filteredCharImage
                 
-                content.text = character.name
-                
+                content.text = character.character.name
                 self.contentConfiguration = content
                 
                 
                 
             }
         }
+        accessoryImageView.image = starFillImage
+       
+        accessoryImageView.isUserInteractionEnabled = true
+       // let cellGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(cellTapped))
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(accessoryViewTapped))
+        
+        accessoryImageView.addGestureRecognizer(gestureRecognizer)
+        accessoryView = accessoryImageView
+        accessoryView?.tintColor = characterManager!.isStarred ? .orange : .gray
    
     }
+
     
-  
-    
-    
+    @objc func accessoryViewTapped() {
+        
+        self.accessoryIsTapped = !accessoryIsTapped
+         
+        
+        delegate?.accessoryViewDidTapped(cell: self, isStarred : accessoryIsTapped)
+    }
+    @objc func cellTapped() {
+        
+        
+        delegate?.cellDidTapped(cell: self)
+    }
+
 }
 
 
