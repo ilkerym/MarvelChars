@@ -16,14 +16,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="marvelLaunch2" translatesAutoresizingMaskIntoConstraints="NO" id="oKS-oS-W1b">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="launch" translatesAutoresizingMaskIntoConstraints="NO" id="oKS-oS-W1b">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O8h-Id-9Kc">
-                                <rect key="frame" x="151.5" y="759" width="111.5" height="53"/>
-                                <string key="text">powered by
-iym</string>
-                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="iym" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O8h-Id-9Kc">
+                                <rect key="frame" x="188" y="782" width="38.5" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="powered by" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Yp-hL-Bfi">
+                                <rect key="frame" x="167" y="765" width="80" height="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -37,6 +41,8 @@ iym</string>
                             <constraint firstItem="oKS-oS-W1b" firstAttribute="top" secondItem="Ze5-6b-2t3" secondAttribute="top" id="L9s-7O-Gux"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="O8h-Id-9Kc" secondAttribute="trailing" id="Nie-xP-SeH"/>
                             <constraint firstItem="oKS-oS-W1b" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Y2g-GW-JQX"/>
+                            <constraint firstItem="O8h-Id-9Kc" firstAttribute="top" secondItem="0Yp-hL-Bfi" secondAttribute="bottom" constant="-1" id="YtO-wW-Eq7"/>
+                            <constraint firstItem="0Yp-hL-Bfi" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="gOG-AU-S2z"/>
                             <constraint firstAttribute="trailing" secondItem="oKS-oS-W1b" secondAttribute="trailing" id="ukr-Uu-LXR"/>
                             <constraint firstAttribute="bottom" secondItem="oKS-oS-W1b" secondAttribute="bottom" id="xF8-a3-mrc"/>
                         </constraints>
@@ -48,7 +54,7 @@ iym</string>
         </scene>
     </scenes>
     <resources>
-        <image name="marvelLaunch2" width="320" height="568"/>
+        <image name="launch" width="474" height="843"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

@@ -26,7 +26,7 @@ struct CharacterDataContainer : Codable {
     let count: Int? //(int, optional): The total number of results returned by this call.,
     let results: [Character]? //(Array[Character], optional): The list of characters returned by the call.
 }
-struct Character : Codable{
+struct Character : Codable {
     var id: Int? // (int, optional): The unique ID of the character resource.,
     var name: String? // (string, optional): The name of the character.,
     var description: String? // (string, optional): A short bio or description of the character.,
@@ -102,56 +102,6 @@ struct SeriesSummary : Codable  {
     let name: String? //(string, optional): The canonical name of the series.
 }
 
-extension ComicList {
-    var urlComics: String? {
-        if let path = collectionURI   {
-            return "\(path.replacingOccurrences(of: "http", with: "https"))"
-        } else {
-            return nil
-        }
-    }
-}
-
-
-extension Image {
-    var url: String? {
-        if let path = path, let thumbnailExtension = imgExt  {
-            return "\(path.replacingOccurrences(of: "http", with: "https")).\(thumbnailExtension)"
-        } else {
-            return nil
-        }
-        
-    }
-}
-extension Character {
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = try values.decode(Int?.self, forKey: .id)
-        name = try values.decode(String?.self, forKey: .name)
-        description = try values.decode(String?.self, forKey: .description)
-        resourceURI = try values.decode(String?.self, forKey: .resourceURI)
-        thumbnail = try values.decode(Image?.self, forKey: .thumbnail)
-        comics = try values.decode(ComicList?.self, forKey: .comics)
-        urls = try values.decode([Url]? .self, forKey: .urls)
-        
-    }
-    
-}
-extension Image {
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        path = try values.decode(String?.self, forKey: .path)
-        imgExt = try values.decode(String?.self, forKey: .imgExt)
-    }
-}
-
-extension Character : Equatable {
-    static func == (lhs: Character, rhs: Character) -> Bool {
-        return lhs.name == rhs.name
-        
-    }
-  
-}
 
 
 

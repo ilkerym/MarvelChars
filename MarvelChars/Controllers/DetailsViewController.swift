@@ -17,31 +17,48 @@ class DetailsViewController: UIViewController {
     @IBOutlet weak var charDescriptionLabel: UILabel!
     @IBOutlet weak var characterImageView: UIImageView!
     @IBOutlet weak var charNameLabel: UILabel!
+    
     // other parameters definitions
     var charLargeImage: UIImage?
-    var selectedCharacter : Character?
+    var charName: String? 
+    var selectedCharacter : MarvelCharacter?
     var comicsSummary = [ComicSummary]()
+    
+    var urlForComics : String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // assign protocols to controller
         detailsTableView.dataSource = self
         detailsTableView.delegate = self
+        detailsTableView.backgroundColor = .black
+        initUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
         
-        initializeUI()
+    }
+    override func viewDidAppear(_ animated: Bool) {
         
     }
     
-    private func initializeUI() {
-        if let marvelCharacter = selectedCharacter {
-            charNameLabel.text = marvelCharacter.name
-            navigationItem.title = "Details"
-            if marvelCharacter.description == "" {
-                charDescriptionLabel.text = "No Available Description"
-            } else {
-                charDescriptionLabel.text = marvelCharacter.description
-            }
+    private func initUI() {
+        navigationItem.leftBarButtonItem?.tintColor = .black
+        navigationItem.title = "Details"
+        if let selectedCharacter = selectedCharacter {
+            charNameLabel.text = selectedCharacter.name
             
+//            if selectedCharacter.character.description == "" {
+//                charDescriptionLabel.text = "No Available Description"
+//            } else {
+//                charDescriptionLabel.text = selectedCharacter.character.description
+//            }
+            
+            
+            charDescriptionLabel.text = selectedCharacter.description.isEmpty ? "No Available Description" : selectedCharacter.description
+            
+        } else {
+            print("error while initializing details view controller")
         }
         
         characterImageView.image = charLargeImage
@@ -63,7 +80,13 @@ extension DetailsViewController: UITableViewDataSource {
         if comicsSummary.isEmpty {
             cell.comicName = "No Available Comic"
         } else {
+            
+            // Sort somics descending order
+            comicsSummary.sort{
+                $0.name!.compare($1.name!, options: .numeric) == .orderedDescending
+            }
             let selectedRow = comicsSummary[indexPath.row]
+            
             cell.comicName = selectedRow.name!
         }
         
@@ -79,7 +102,21 @@ extension DetailsViewController: UITableViewDelegate {
         // to make tableview cells non-selectable
         return nil
     }
+    
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let headerLabel = UILabel()
+        headerLabel.text = "Comics List"
+        headerLabel.textColor = .systemBlue
+
+        return headerLabel
+    }
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 30
+    }
 }
+
 
 
 

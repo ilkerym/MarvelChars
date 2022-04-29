@@ -1,51 +1,48 @@
 //
-//  DetailTableViewCell.swift
+//  MainTableViewCell.swift
 //  MarvelChars
 //
-//  Created by İlker Yasin Memişoğlu on 22.02.2022.
+//  Created by İlker Yasin Memişoğlu on 26.04.2022.
 //
 
 import UIKit
 
-class DetailsTableViewCell: UITableViewCell {
+class MainTableViewCell: UITableViewCell {
+   
     
-    @IBOutlet weak var comicsLabel: UILabel!
-    
-    var comicName = String()
-    
+    var title = String()
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
         
-        self.layer.cornerRadius = .pi
-        self.tintColor = .darkGray
         
     }
-    
+
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
-        
+
         // Configure the view for the selected state
     }
-    
     
     override func updateConfiguration(using state: UICellConfigurationState) {
         super.updateConfiguration(using: state)
         
-        var content = defaultContentConfiguration()
+        var mainContent = defaultContentConfiguration()
 
-        content.text = comicName
-        content.textProperties.color = .white
-        
+        mainContent.text = title
+        mainContent.textProperties.color = .black
         
         var backgroundConfig = backgroundConfiguration
+        backgroundConfig?.backgroundColor = .systemRed
         
-        backgroundConfig?.backgroundColor = .darkGray
- 
-        contentConfiguration = content
+        contentConfiguration = mainContent
         backgroundConfiguration = backgroundConfig
+       
+        
+        self.accessoryType = .disclosureIndicator
+        self.accessoryView?.tintColor = .black
         
     }
     
-    
+
 }
