@@ -21,7 +21,7 @@ class DetailsViewController: UIViewController {
     // other parameters definitions
     var charLargeImage: UIImage?
     var charName: String? 
-    var selectedCharacter : MarvelCharacter?
+    var charDescription : String?
     var comicsSummary = [ComicSummary]()
     
     var urlForComics : String?
@@ -45,8 +45,12 @@ class DetailsViewController: UIViewController {
     private func initUI() {
         navigationItem.leftBarButtonItem?.tintColor = .black
         navigationItem.title = "Details"
-        if let selectedCharacter = selectedCharacter {
-            charNameLabel.text = selectedCharacter.name
+        
+        charNameLabel.text = charName
+        charDescriptionLabel.text = charDescription
+        characterImageView.image = charLargeImage
+        
+        // buraya comicler gelecek
             
 //            if selectedCharacter.character.description == "" {
 //                charDescriptionLabel.text = "No Available Description"
@@ -55,13 +59,11 @@ class DetailsViewController: UIViewController {
 //            }
             
             
-            charDescriptionLabel.text = selectedCharacter.description.isEmpty ? "No Available Description" : selectedCharacter.description
+//            charDescriptionLabel.text = selectedCharacter.description.isEmpty ? "No Available Description" : selectedCharacter.charDescription
             
-        } else {
-            print("error while initializing details view controller")
-        }
+       
         
-        characterImageView.image = charLargeImage
+        
         
     }
     

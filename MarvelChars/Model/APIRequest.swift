@@ -10,14 +10,15 @@ import Alamofire
 import CryptoKit
 
 final class APIRequest {
-    
+    var id : Int
     var offset : Int
     var nameStartsWith : String
     var comicsDetailRequested : Bool
     
  
     
-    init(offset : Int, nameStartsWith: String = "", comicsDetailRequested: Bool = false) {
+    init(id: Int = Int(),offset : Int, nameStartsWith: String = "", comicsDetailRequested: Bool = false) {
+        self.id = id
         self.offset = offset
         self.nameStartsWith = nameStartsWith
         self.comicsDetailRequested = comicsDetailRequested
@@ -38,10 +39,7 @@ final class APIRequest {
     // parameters for API request
     var parameters: [String : Any] {
        
-        if comicsDetailRequested {
-            return ["apikey":apiKey,"ts": ts,"hash": hash,"limit": limit,"offset": offset, "startYear": "2005"]
-            
-        } else {
+      
             if nameStartsWith != "" {
                 return ["apikey":apiKey,"ts": ts,"hash": hash,"limit": limit,"offset": offset, "nameStartsWith": nameStartsWith]
             } else {
@@ -50,7 +48,7 @@ final class APIRequest {
             }
         }
         
-    }
+    
     // MD5 Conversion
     func MD5(data: String) -> String {
         let hash = Insecure.MD5.hash(data: data.data(using: .utf8) ?? Data())
@@ -64,10 +62,11 @@ final class APIRequest {
                     
                 case .none:
                     print("error while fetching Character Data Wrapper")
-                case .some(let wrapper):
-                    if let characterData = wrapper.data?.results {
-                        completionHandler(characterData)
+                case .some(let apiResponse):
+                    if let result = apiResponse.data?.results {
+                        completionHandler(result)
                     }
+                    
                 }
             }
     }

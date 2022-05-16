@@ -18,12 +18,15 @@ protocol FavoriteCellDelegate
 class FavoriteTableViewCell: UITableViewCell {
     
     var delegate: FavoriteCellDelegate?
-    var favoriteCharacter : MarvelCharacter?
-    let welcomeCharacter = MarvelCharacter(id: 0, nameOfCharacter: "No favorite character added yet", characterImageURL: "", isStarred: false, description: "No Available Description", character: Character())
-    var charImage = UIImage(), emptyImage = UIImage(systemName: "photo")?.withTintColor(.gray, renderingMode: .alwaysOriginal)
+    var favoriteCharacter : AllCharacter?
+//    let welcomeCharacter = MarvelCharacter(id: 0, name: "No favorite character added yet", description: "", isStarred: false, imageURL: "")
+    
+   
+    var charImage = UIImage()
+    var emptyImage = UIImage(systemName: "photo")?.withTintColor(.gray, renderingMode: .alwaysOriginal)
   
     let starFillImage = UIImage(named: "star.fill")
-    var accessoryIsTapped  = false
+    var accessoryIsTapped  = true
     var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 25 , height: 25))
     var welcomeMessage : String?
     
@@ -46,7 +49,7 @@ class FavoriteTableViewCell: UITableViewCell {
         if let character = favoriteCharacter {
             
             // Image Response Serializers
-            AF.request(character.characterImageURL).responseImage { response in
+            AF.request(character.imageURL!).responseImage { response in
                 
                 guard let data = response.data else {return print("error while fetching character image")}
                 
@@ -64,7 +67,7 @@ class FavoriteTableViewCell: UITableViewCell {
                
                     favoriteContent.image = filteredCharImage
                     
-                    favoriteContent.text = character.name
+                favoriteContent.text = self.favoriteCharacter?.charName
                 
                 
                 self.contentConfiguration = favoriteContent
@@ -84,7 +87,7 @@ class FavoriteTableViewCell: UITableViewCell {
 
             var welcomeContent = defaultContentConfiguration().updated(for: state)
             welcomeContent.image = emptyImage
-            welcomeContent.text = welcomeCharacter.name
+           // welcomeContent.text = welcomeCharacter.name
             contentConfiguration = welcomeContent
             
             accessoryImageView.image = starFillImage

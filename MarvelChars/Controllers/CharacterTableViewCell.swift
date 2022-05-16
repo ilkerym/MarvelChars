@@ -8,6 +8,7 @@
 import UIKit
 import Alamofire
 import AlamofireImage
+import CoreData
 
 protocol CharacterCellDelegate {
     func accessoryViewDidTapped(cell: CharacterTableViewCell, isStarred: Bool)
@@ -19,20 +20,23 @@ class CharacterTableViewCell: UITableViewCell {
     
     var delegate: CharacterCellDelegate?
     
-    var marvelCharacter : MarvelCharacter?
+    var marvelCharacter : AllCharacter?
     var charImage = UIImage()
     var accessoryIsTapped  = false
-    var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 25 , height: 25))
+    var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 27 , height: 27))
     let starFillImage = UIImage(named: "star.fill")
+    
     
 
     override func updateConfiguration(using state: UICellConfigurationState) {
         super.updateConfiguration(using: state)
        
-        if let character = marvelCharacter {
-
+        
+        
+        if  let character = marvelCharacter {
+            guard let url = character.imageURL else {return print("error image URL")}
             // Image Response Serializers
-            AF.request(character.characterImageURL).responseImage { response in
+            AF.request(url).responseImage { response in
                 
                 guard let data = response.data else {return print("error while fetching character image")}
                
@@ -49,12 +53,38 @@ class CharacterTableViewCell: UITableViewCell {
 
                 content.image = filteredCharImage 
                 
-                content.text = character.name
+                content.text = character.charName
                 
                 self.contentConfiguration = content
                 
             }
         }
+//        else {
+//            guard let character = searchedCharacter else {return print("search population error")}
+//            AF.request(character.imageURL).responseImage { response in
+//
+//                guard let data = response.data else {return print("error while fetching character image")}
+//
+//                self.charImage = UIImage(data: data) ?? UIImage(systemName: "photo")!
+//
+//                //apply image filter
+//                let size = CGSize(width: 85.0, height: 85.0)
+//
+//                let imageFilter = AspectScaledToFillSizeWithRoundedCornersFilter(size: size, radius: 5)
+//
+//                let filteredCharImage = imageFilter.filter(self.charImage)
+//
+//                var content = self.defaultContentConfiguration().updated(for: state)
+//
+//                content.image = filteredCharImage
+//
+//                content.text = character.name
+//
+//                self.contentConfiguration = content
+//
+//            }
+            
+//        }
         
         accessoryImageView.image = starFillImage
         accessoryImageView.isUserInteractionEnabled = true
@@ -68,7 +98,7 @@ class CharacterTableViewCell: UITableViewCell {
         accessoryImageView.tintColor = characterInManager.isStarred ? .orange : .gray
        
     }
-
+  
     
     @objc func accessoryViewTapped() {
         

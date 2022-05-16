@@ -9,54 +9,51 @@ import Foundation
 
 
 class MarvelCharacter {
-    
+
     let id : Int
     let name : String
-    let characterImageURL : String
+    let charDescription : String
     var isStarred : Bool
-    let description : String
-    let character : Character
-   
-     
-    
-    init(id: Int, nameOfCharacter: String,characterImageURL : String, isStarred: Bool = false, description : String, character: Character) {
+    let imageURL : String
+
+
+    init(id: Int, name: String, description : String, isStarred: Bool = false, imageURL : String) {
         self.id = id
-        self.name = nameOfCharacter
+        self.name = name
+        self.charDescription = description
         self.isStarred = isStarred
-        self.description = description
-        self.characterImageURL = characterImageURL
-        self.character = character
+        self.imageURL = imageURL
+
     }
-    
 }
+
+
 
 
 extension MarvelCharacter: Hashable {
     func hash(into hasher: inout Hasher) {
-        hasher.combine(name)
         hasher.combine(id)
-        hasher.combine(characterImageURL)
+        hasher.combine(name)
+        hasher.combine(charDescription)
         hasher.combine(isStarred)
-        hasher.combine(description)
-        
-        
-        
+        hasher.combine(imageURL)
+
     }
-  
+
 }
 
 
-//extension MarvelCharacter: Comparable {
-//    static func < (lhs: MarvelCharacter, rhs: MarvelCharacter) -> Bool {
-//        return lhs.name < rhs.name
-//    }
-//    
-//    
-//}
+extension MarvelCharacter: Comparable {
+    static func < (lhs: MarvelCharacter, rhs: MarvelCharacter) -> Bool {
+        return lhs.name < rhs.name
+    }
+
+
+}
 extension MarvelCharacter: Equatable {
     static func == (lhs: MarvelCharacter, rhs: MarvelCharacter) -> Bool {
         return lhs === rhs
-        
+
     }
 }
 

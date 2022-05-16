@@ -27,6 +27,7 @@ class MainViewController: UIViewController {
 }
 
 extension MainViewController : UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return mainTitles.count
     }
@@ -40,7 +41,6 @@ extension MainViewController : UITableViewDataSource {
         return cell
     }
     
-
 }
 extension MainViewController : UITableViewDelegate {
     

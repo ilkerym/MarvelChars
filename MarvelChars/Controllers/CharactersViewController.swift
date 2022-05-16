@@ -20,23 +20,32 @@ class CharactersViewController: UIViewController{
     //parameter definitions
     private var character = [Character]()
     private let apiRequest = APIRequest(offset: 0), newCharRequest = APIRequest(offset: 30)
-    let requestNew = APIRequest(offset: 0, nameStartsWith: "", comicsDetailRequested: true)
+    let requestForComics = APIRequest(offset: 0)
     private let activityIndicator = UIActivityIndicatorView()
     private var isPaginating = false
+    private var searchActive = false
+    var allCharacters = [AllCharacter]()
+    var searchedCharacter = [AllCharacter]()
     
-    var allCharacters = [MarvelCharacter](), searchedCharacter = [MarvelCharacter]()
-    static var  favoriteCharacters = [MarvelCharacter]()
-    var searchActive = false
-    var favChars = [FavoriteCharacters]()
+    static var favoriteCharacters = [AllCharacter]()
+    
+    var favorite = AllCharacter()
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    let request : NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest()
+    var predicateForSearch : NSPredicate? = nil
     
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
         tableView.register(CharacterTableViewCell.self, forCellReuseIdentifier: "characterCell")
+        
+        context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
         
         // assigns protocols to ViewController
         tableView.dataSource = self
@@ -45,21 +54,31 @@ class CharactersViewController: UIViewController{
         
         // initialize UI
         setSearchBarAppearance()
-        showSpinner()
-        networkRequest(pagination: false)
+        loadAllCharacters()
+        if allCharacters.isEmpty {
+            showSpinner()
+            networkRequest(pagination: false)
+        }
         
-    }
-    override func viewDidAppear(_ animated: Bool) {
-        print("viewdidappear called")
+        
     }
     override func viewWillAppear(_ animated: Bool) {
         print("viewWillappear called")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Favorites", style: .plain, target: self, action: #selector(goFavorite))
         navigationItem.rightBarButtonItem?.tintColor = .systemRed
-            //.init(barButtonSystemItem: .play, target: self, action: #selector(goFavorite))
+        loadAllCharacters(with: request, predicate: predicateForSearch)
+        
         
     }
+    override func viewDidAppear(_ animated: Bool) {
+        print("viewdidappear called")
+        
+        
+    }
+    
+    
     @objc func goFavorite() {
+        
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "FavoriteTableViewController") as! FavoriteTableViewController
         navigationController?.pushViewController(destinationVC, animated: true)
         
@@ -70,40 +89,12 @@ class CharactersViewController: UIViewController{
         searchBar.tintColor = .white
         searchBar.searchTextField.backgroundColor = .white
         searchBar.placeholder = "Search Character"
+        
         let cancelButtonAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         UIBarButtonItem.appearance().setTitleTextAttributes(cancelButtonAttributes , for: .normal)
         
     }
     
-    //    func loadFavoriteCharacters() {
-    //
-    //        let request : NSFetchRequest<FavoriteCharacters> = FavoriteCharacters.fetchRequest()
-    //
-    //        do {
-    //            favChars =  try context.fetch(request)
-    //        } catch {
-    //
-    //            print("error occurred while loading favorite character to UI, error definition \(error)")
-    //        }
-    //
-    //        tableView.reloadData()
-    //
-    //    }
-    //    func saveFavorites(){
-    //        do {
-    //            try context.save()
-    //        }
-    //        catch {
-    //            print("error occured while saving new character, error definition \(error)")
-    //        }
-    //
-    //        self.tableView.reloadData()
-    //
-    //
-    //    }
-    
-   
-   
     // spinner configuration function
     private func showSpinner() {
         activityIndicator.frame = self.view.bounds
@@ -112,13 +103,11 @@ class CharactersViewController: UIViewController{
         activityIndicator.center = view.center
         activityIndicator.startAnimating()
         view.addSubview(activityIndicator)
-        
     }
     private func removeSpinner() {
         activityIndicator.stopAnimating()
         activityIndicator.removeFromSuperview()
     }
-    
     // API request function
     private func networkRequest(pagination: Bool) {
         
@@ -131,9 +120,8 @@ class CharactersViewController: UIViewController{
                 self.configureAllCharacters(with: response)
                 self.newCharRequest.offset += 30
                 self.isPaginating = false
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
+                
+                
             }
         }
         else {
@@ -141,24 +129,94 @@ class CharactersViewController: UIViewController{
                 self.configureAllCharacters(with: response)
                 DispatchQueue.main.async {
                     self.removeSpinner()
-                    self.tableView.reloadData()
+                    // self.tableView.reloadData()
                 }
             }
         }
         
     }
-    func configureAllCharacters(with responseData: [Character]) {
+    func configureAllCharacters(with characters: [Character]) {
         
-        for character in responseData {
+        for item in characters {
             
-            if let id = character.id, let name = character.name, let url = character.thumbnail?.url, let description = character.description {
-                self.allCharacters.append(MarvelCharacter(id: id, nameOfCharacter: name, characterImageURL: url, description: description, character: character ))
+            if let id = item.id, let name = item.name, let imageUrl = item.thumbnail?.url, let description = item.description {
+                
+                
+                let newCharacter = AllCharacter(context: self.context)
+                newCharacter.id = Int64(id)
+                newCharacter.charName = name
+                newCharacter.isStarred = false
+                newCharacter.imageURL = imageUrl
+                newCharacter.charDescription = description
+                newCharacter.searched = false
+                allCharacters.append(newCharacter)
+                
+                saveAllCharacters()
+                
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                }
+                
             }
-            
             
         }
         
     }
+    //MARK: - CRUD Functions
+    
+    //Create or Save Character
+    
+    func saveAllCharacters() {
+        
+        do {
+            try  context.save()
+        }
+        catch {
+            print("error occured while saving data , error definition \(error)")
+        }
+        
+        
+    }
+    
+    
+    
+    
+    
+    // READ from DB
+    func loadAllCharacters(with request: NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest(), predicate : NSPredicate? = nil) {
+        
+        let predicateSearchOff = NSPredicate(format: "searched = %d", false)
+        let predicateSearchOn = NSPredicate(format: "searched = %d", true)
+        
+        if let additionalpredicate = predicate {
+            print("aadditional workss")
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicateSearchOn,additionalpredicate])
+        } else {
+            
+            print("default workss")
+            request.predicate = predicateSearchOff
+        }
+        
+        
+        request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
+        
+        
+        //            request.predicate = searchActive ? predicateSearchOn : predicateSearchOff
+        
+        do {
+            
+            allCharacters =  try context.fetch(request)
+            
+            
+        } catch {
+            
+            print("error occurred while loading all characters to UI, error definition \(error)")
+        }
+        
+        tableView.reloadData()
+        
+    }
+    
     
 }
 
@@ -168,20 +226,42 @@ extension CharactersViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         
+        
         if let typedName = searchBar.searchTextField.text {
-            // call search api function
+            
             searchActive = true
-            searchOnMarvel(with: typedName)
+
+            predicateForSearch = NSPredicate(format: "charName  BEGINSWITH[c]  %@ ", typedName)
+            
+            loadAllCharacters(with: request, predicate: predicateForSearch)
+            
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+            print("searchedCharacter.count---\(allCharacters.count)")
+            
+            // all characters returned here are searched characters filtering via predicate
+            if allCharacters.isEmpty {
+                // call search api function
+                searchOnMarvel(with: typedName)
+            }
+            
+            if !searchActive {
+                predicateForSearch = nil // if predicate here different from nil when going back from favorites view controller, character VC loads all characters, it doesn't matter true or false
+            }
+            
+            
+            
         }
-        searchBar.searchTextField.text = "Tap cancel to view characters"
+        
+        searchBar.searchTextField.text = "Tap cancel for all characters"
         searchBar.setShowsCancelButton(true, animated: true)
         searchBar.tintColor = .clear
         searchBar.resignFirstResponder()  // after this line, keyboard should be disappear.
         
- 
+        
     }
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        
         
         searchBar.tintColor = .darkGray
         
@@ -201,9 +281,8 @@ extension CharactersViewController: UISearchBarDelegate {
         searchBar.endEditing(true)
         searchBar.setShowsCancelButton(false, animated: true)
         searchActive = false
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
+        loadAllCharacters()
+        
         
     }
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
@@ -219,12 +298,12 @@ extension CharactersViewController: UISearchBarDelegate {
         searchBar.setShowsCancelButton(true, animated: true)
     }
     
-    
     func searchOnMarvel(with name: String) {
         
         let requestForSearch = APIRequest(offset: 0, nameStartsWith: name)
         
         requestForSearch.fetchDataWrapper(with: requestForSearch.parameters) { response in
+            
             if response.isEmpty {
                 
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
@@ -235,23 +314,32 @@ extension CharactersViewController: UISearchBarDelegate {
                     }
                     
                     alertController.addAction(cancelAction)
-                   self.present(alertController, animated: true, completion: nil)
+                    self.present(alertController, animated: true, completion: nil)
                 }
                 
             }else {
-                for item in response {
-                    guard let searchedID = item.id, let searchedName = item.name, let url = item.thumbnail?.url, let description = item.description  else {return print("error while searching character") }
+                for character in response {
+                    guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while searching character") }
                     
-                    self.searchedCharacter.append(MarvelCharacter(id: searchedID, nameOfCharacter: searchedName, characterImageURL: url, isStarred: false, description: description, character: item))
+                    let newCharacter = AllCharacter(context: self.context)
+                    newCharacter.id = Int64(searchedID)
+                    newCharacter.charName = searchedName
+                    newCharacter.isStarred = false
+                    newCharacter.charDescription = searchedDescription
+                    newCharacter.imageURL = searchedURL
+                    newCharacter.searched = true  // searched character
+                    self.allCharacters.append(newCharacter)
+                    self.saveAllCharacters()
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                    
                 }
-                DispatchQueue.main.async {
-                    self.tableView.reloadData()
-                }
+                
             }
-         
+            
         }
         
-        searchedCharacter = [MarvelCharacter]()
     }
     
 }
@@ -261,18 +349,15 @@ extension CharactersViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         
+        return allCharacters.count
         
-        return searchActive ? searchedCharacter.count : allCharacters.count
-
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell", for: indexPath) as! CharacterTableViewCell
         
         cell.delegate = self
-        
-        cell.marvelCharacter = searchActive ? searchedCharacter[indexPath.row] : allCharacters[indexPath.row]
-        
+        cell.marvelCharacter = allCharacters[indexPath.row]
         
         return cell
         
@@ -288,17 +373,19 @@ extension CharactersViewController: UITableViewDelegate {
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
         
-        guard let data = cell.marvelCharacter else {return print("error")}
-        if let comics = data.character.comics?.items {
-            destinationVC.comicsSummary = comics
-        }
+        guard let character = cell.marvelCharacter else {return print("error")}
+        destinationVC.charLargeImage = cell.charImage // Due to the size of image different, I take image from cell
+        destinationVC.charName = character.charName
+        destinationVC.charDescription = character.charDescription
         
-        destinationVC.charLargeImage = cell.charImage
-        destinationVC.charName = cell.marvelCharacter?.name
-        destinationVC.selectedCharacter = cell.marvelCharacter
+        
+        
         navigationController?.pushViewController(destinationVC, animated: true)
         
+        print(character.id)
+        
     }
+    
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
@@ -320,7 +407,6 @@ extension CharactersViewController: UITableViewDelegate {
             tableView.tableFooterView = spinner
             
             tableView.tableFooterView?.isHidden = false
-            
             
         }
     }
@@ -351,40 +437,20 @@ extension CharactersViewController: CharacterCellDelegate {
         // guard let indexPath = tableView.indexPath(for: cell) else {return}
         
     }
-    
     func accessoryViewDidTapped(cell: CharacterTableViewCell, isStarred: Bool) {
         
-        // guard let indexPath = tableView.indexPath(for: cell) else {return print("error while tapping cell")}
-        cell.marvelCharacter?.isStarred = cell.accessoryIsTapped
+        //      guard let indexPath = tableView.indexPath(for: cell) else {return print("error while tapping cell")}
+        cell.marvelCharacter?.isStarred = isStarred
         cell.accessoryImageView.tintColor = cell.accessoryIsTapped ? .orange : .gray
         
+        saveAllCharacters()
+        CharactersViewController.favoriteCharacters = allCharacters.filter{ $0.isStarred == true}
         
-        guard let character = cell.marvelCharacter else {return print("error while unwrapping cell character")}
-        if cell.accessoryIsTapped {
-            if CharactersViewController.favoriteCharacters.contains(character) {
-                return
-            } else {
-                
-                
-                CharactersViewController.favoriteCharacters.append(character)
-            }
-            
-        } else {
-            
-            if let index = CharactersViewController.favoriteCharacters.firstIndex(of: character) {
-                CharactersViewController.favoriteCharacters.remove(at: index)
-            }
-        }
         
-       
         
     }
     
 }
-
-
-
-
 
 
 
