@@ -9,67 +9,88 @@ import UIKit
 import Alamofire
 import CryptoKit
 
-final class APIRequest {
-    var id : Int
+class APIRequest {
+    
     var offset : Int
     var nameStartsWith : String
-    var comicsDetailRequested : Bool
-    
+    var limit : Int
  
-    
-    init(id: Int = Int(),offset : Int, nameStartsWith: String = "", comicsDetailRequested: Bool = false) {
-        self.id = id
+    init(offset : Int, limit: Int = 30, nameStartsWith: String = "") {
+        self.limit = limit
         self.offset = offset
         self.nameStartsWith = nameStartsWith
-        self.comicsDetailRequested = comicsDetailRequested
     }
     
-    let baseUrl = "https://gateway.marvel.com:443/v1/public/characters"
-    
-    let apiKey = "6bc760706a50feb51400ffff42782383"
-    let privateKey = "629391ddc039d9f9615e10b323fb22984f145016"
-    
-    let ts  = String(Date().timeIntervalSince1970)
-    var limit = 30
+    // parameters for API request
+    let baseUrl: String = "https://gateway.marvel.com:443/v1/public/characters"
+    let ts: String = String(Date().timeIntervalSince1970)
+    let apiKey : String = "6bc760706a50feb51400ffff42782383"
+    let privateKey :String = "629391ddc039d9f9615e10b323fb22984f145016"
     var hash : String {
-        return MD5(data:"\(ts)\(privateKey)\(apiKey)")
+         
+        return MD5(data: "\(ts)\(privateKey)\(apiKey)")
+    }
+    var parametersForCharacter: [String : Any] {
+        
+        if nameStartsWith != ""  {
+            return ["apikey": apiKey, "ts": ts, "hash": hash, "limit": limit, "offset": offset, "nameStartsWith": nameStartsWith]
+        } else {
+            
+            return ["apikey":apiKey,"ts": ts,"hash": hash,"limit": limit,"offset": offset]
+        }
+    }
+    var parametersForComic : [String : Any] {
+        return ["apikey": apiKey, "ts": ts, "hash": hash, "limit": limit, "offset": offset]
     }
     
 
-    // parameters for API request
-    var parameters: [String : Any] {
-       
-      
-            if nameStartsWith != "" {
-                return ["apikey":apiKey,"ts": ts,"hash": hash,"limit": limit,"offset": offset, "nameStartsWith": nameStartsWith]
-            } else {
-     
-                return ["apikey":apiKey,"ts": ts,"hash": hash,"limit": limit,"offset": offset]
-            }
-        }
-        
-    
+
     // MD5 Conversion
     func MD5(data: String) -> String {
         let hash = Insecure.MD5.hash(data: data.data(using: .utf8) ?? Data())
         return hash.map{String(format: "%02hhx", $0)}.joined()
     }
     // function for API request
-    func fetchDataWrapper(with input : [String: Any], completionHandler: @escaping ([Character]) -> Void)  {
-            
-            AF.request(baseUrl, parameters: parameters).responseDecodable(of: CharacterDataWrapper.self) { response in
-                switch response.value {
-                    
-                case .none:
-                    print("error while fetching Character Data Wrapper")
-                case .some(let apiResponse):
-                    if let result = apiResponse.data?.results {
-                        completionHandler(result)
+    func fetchCharacter(completionHandler: @escaping (Result<[Character],AFError>) -> Void)  {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        AF.request(baseUrl, parameters: parametersForCharacter).responseDecodable(of: CharacterDataModel.self, decoder: decoder) { response in
+
+            switch response.result {
+                
+            case .success(let responseData):
+                if let data = responseData.data {
+                    if let result = data.results {
+                        completionHandler(.success(result))
                     }
                     
                 }
+               
+            case .failure(let error):
+                print("error description -- \(error)")
             }
+        }
+    }
+    
+    func fetchComics(Url: String, onComplete : @escaping (Result<[Comic], AFError>) -> Void){
+        
+       let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        
+        AF.request(Url, parameters: parametersForComic ).responseDecodable(of: ComicDataModel.self, decoder: decoder) { response in
+            
+            
+            switch response.result {
+                
+            case .success(let responseData):
+                //print(response)
+                if let result = responseData.data?.results {
+                    onComplete(.success(result))
+                }
+            case .failure(let err):
+                onComplete(.failure(err))
+                print(err)
+            }
+        }
     }
 }
-
-

@@ -6,11 +6,8 @@
 //
 
 import Foundation
-import Alamofire
 
-
-
-struct CharacterDataWrapper: Codable {
+struct CharacterDataModel: Codable {
     let code : Int? //The HTTP status code of the returned result.,
     let status : String? //(string, optional): A string description of the call status.,
     let copyright: String? //(string, optional): The copyright notice for the returned result.,

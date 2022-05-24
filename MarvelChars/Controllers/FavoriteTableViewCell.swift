@@ -19,16 +19,13 @@ class FavoriteTableViewCell: UITableViewCell {
     
     var delegate: FavoriteCellDelegate?
     var favoriteCharacter : AllCharacter?
-//    let welcomeCharacter = MarvelCharacter(id: 0, name: "No favorite character added yet", description: "", isStarred: false, imageURL: "")
-    
-   
     var charImage = UIImage()
     var emptyImage = UIImage(systemName: "photo")?.withTintColor(.gray, renderingMode: .alwaysOriginal)
   
     let starFillImage = UIImage(named: "star.fill")
     var accessoryIsTapped  = true
     var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 25 , height: 25))
-    var welcomeMessage : String?
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -49,7 +46,7 @@ class FavoriteTableViewCell: UITableViewCell {
         if let character = favoriteCharacter {
             
             // Image Response Serializers
-            AF.request(character.imageURL!).responseImage { response in
+            AF.request(character.imgUrl!).responseImage { response in
                 
                 guard let data = response.data else {return print("error while fetching character image")}
                 
@@ -65,9 +62,9 @@ class FavoriteTableViewCell: UITableViewCell {
                 var favoriteContent = self.defaultContentConfiguration().updated(for: state)
                 
                
-                    favoriteContent.image = filteredCharImage
+                favoriteContent.image = filteredCharImage
                     
-                favoriteContent.text = self.favoriteCharacter?.charName
+                favoriteContent.text = self.favoriteCharacter?.charName 
                 
                 
                 self.contentConfiguration = favoriteContent
@@ -83,18 +80,7 @@ class FavoriteTableViewCell: UITableViewCell {
             
             guard let characterInFavorites = favoriteCharacter else {return print("error while updating, marking cell star")}
             accessoryImageView.tintColor = characterInFavorites.isStarred ? .orange : .gray
-        } else {
-
-            var welcomeContent = defaultContentConfiguration().updated(for: state)
-            welcomeContent.image = emptyImage
-           // welcomeContent.text = welcomeCharacter.name
-            contentConfiguration = welcomeContent
-            
-            accessoryImageView.image = starFillImage
-            accessoryImageView.isUserInteractionEnabled = false
-            accessoryView = accessoryImageView
-            accessoryImageView.tintColor = .gray
-        }
+        } 
         
     }
    

@@ -17,26 +17,24 @@ class CharactersViewController: UIViewController{
     // outlet definitions
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
+    
     //parameter definitions
     private var character = [Character]()
-    private let apiRequest = APIRequest(offset: 0), newCharRequest = APIRequest(offset: 30)
-    let requestForComics = APIRequest(offset: 0)
+    private let charRequest = APIRequest(offset: 0), newCharRequest = APIRequest(offset: 30)
     private let activityIndicator = UIActivityIndicatorView()
     private var isPaginating = false
     private var searchActive = false
-    var allCharacters = [AllCharacter]()
-    var searchedCharacter = [AllCharacter]()
+    private var allCharacters = [AllCharacter]()
+    private var searchedCharacter = [AllCharacter]()
     
     static var favoriteCharacters = [AllCharacter]()
     
-    var favorite = AllCharacter()
+    private var favorite = AllCharacter()
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
-    let request : NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest()
-    var predicateForSearch : NSPredicate? = nil
-    
-    
+    private let request : NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest()
+    private var predicateForSearchOn : NSPredicate? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -54,11 +52,16 @@ class CharactersViewController: UIViewController{
         
         // initialize UI
         setSearchBarAppearance()
+        
+        //Read from Database
         loadAllCharacters()
+        
         if allCharacters.isEmpty {
             showSpinner()
             networkRequest(pagination: false)
         }
+        
+        
         
         
     }
@@ -66,7 +69,14 @@ class CharactersViewController: UIViewController{
         print("viewWillappear called")
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Favorites", style: .plain, target: self, action: #selector(goFavorite))
         navigationItem.rightBarButtonItem?.tintColor = .systemRed
-        loadAllCharacters(with: request, predicate: predicateForSearch)
+        
+        if !searchActive {
+            predicateForSearchOn = nil // if predicate here is different from nil, by the time going back from favorites view controller, character VC loads all characters, it doesn't matter that characters are true or false
+            loadAllCharacters()
+        } else {
+          
+            loadAllCharacters(with: request, predicate: predicateForSearchOn)
+        }
         
         
     }
@@ -104,6 +114,7 @@ class CharactersViewController: UIViewController{
         activityIndicator.startAnimating()
         view.addSubview(activityIndicator)
     }
+    
     private func removeSpinner() {
         activityIndicator.stopAnimating()
         activityIndicator.removeFromSuperview()
@@ -115,24 +126,38 @@ class CharactersViewController: UIViewController{
             if pagination {
                 isPaginating = true
             }
-            newCharRequest.fetchDataWrapper(with: newCharRequest.parameters) { response in
-                
-                self.configureAllCharacters(with: response)
-                self.newCharRequest.offset += 30
-                self.isPaginating = false
-                
-                
+            newCharRequest.fetchCharacter() { response in
+                switch response {
+                    
+                case .success(let data):
+                    self.configureAllCharacters(with: data)
+                    self.newCharRequest.offset += 30
+                    self.isPaginating = false
+                case .failure(let error):
+                    print(error)
+                }
+  
             }
         }
         else {
-            apiRequest.fetchDataWrapper(with: apiRequest.parameters) { response in
-                self.configureAllCharacters(with: response)
-                DispatchQueue.main.async {
-                    self.removeSpinner()
-                    // self.tableView.reloadData()
+            charRequest.fetchCharacter() { response in
+                print("charRequest.offset\(self.charRequest.offset)")
+                switch response {
+                    
+                case .success(let data):
+                    self.configureAllCharacters(with: data)
+                    DispatchQueue.main.async {
+                        self.removeSpinner()
+                        // self.tableView.reloadData()
+                    }
+                case .failure(let error):
+                    print(error)
                 }
+                
+                
             }
         }
+        
         
     }
     func configureAllCharacters(with characters: [Character]) {
@@ -141,12 +166,11 @@ class CharactersViewController: UIViewController{
             
             if let id = item.id, let name = item.name, let imageUrl = item.thumbnail?.url, let description = item.description {
                 
-                
                 let newCharacter = AllCharacter(context: self.context)
                 newCharacter.id = Int64(id)
                 newCharacter.charName = name
                 newCharacter.isStarred = false
-                newCharacter.imageURL = imageUrl
+                newCharacter.imgUrl = imageUrl
                 newCharacter.charDescription = description
                 newCharacter.searched = false
                 allCharacters.append(newCharacter)
@@ -177,47 +201,36 @@ class CharactersViewController: UIViewController{
         
         
     }
-    
-    
-    
-    
-    
+
     // READ from DB
     func loadAllCharacters(with request: NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest(), predicate : NSPredicate? = nil) {
         
-        let predicateSearchOff = NSPredicate(format: "searched = %d", false)
-        let predicateSearchOn = NSPredicate(format: "searched = %d", true)
+        let predicateForSearchOff = NSPredicate(format: "searched = %d", false)
+        let predicateForSearchOn = NSPredicate(format: "searched = %d", true)
         
         if let additionalpredicate = predicate {
             print("aadditional workss")
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicateSearchOn,additionalpredicate])
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [predicateForSearchOn,additionalpredicate])
         } else {
             
             print("default workss")
-            request.predicate = predicateSearchOff
+            request.predicate = predicateForSearchOff
         }
         
         
-        request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
-        
-        
-        //            request.predicate = searchActive ? predicateSearchOn : predicateSearchOff
-        
+       // request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
+
         do {
             
             allCharacters =  try context.fetch(request)
             
-            
         } catch {
-            
             print("error occurred while loading all characters to UI, error definition \(error)")
         }
-        
-        tableView.reloadData()
-        
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
     }
-    
-    
 }
 
 // MARK: -SearchBar Delegate Functions
@@ -225,33 +238,33 @@ extension CharactersViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
+        searchActive = true
+        let spinner = UIActivityIndicatorView(style: .medium)
+        spinner.color = .black
+        
+        DispatchQueue.main.async {
+            self.tableView.backgroundView = spinner
+            spinner.startAnimating()
+        }
         
         
+       
         if let typedName = searchBar.searchTextField.text {
-            
-            searchActive = true
 
-            predicateForSearch = NSPredicate(format: "charName  BEGINSWITH[c]  %@ ", typedName)
+            predicateForSearchOn = NSPredicate(format: "charName  BEGINSWITH[c]  %@", typedName)
+
+            loadAllCharacters(with: request, predicate: predicateForSearchOn)
+            print("returnedAllCharacter.count---\(allCharacters.count)")
             
-            loadAllCharacters(with: request, predicate: predicateForSearch)
-            
-            DispatchQueue.main.async {
-                self.tableView.reloadData()
-            }
-            print("searchedCharacter.count---\(allCharacters.count)")
-            
-            // all characters returned here are searched characters filtering via predicate
+            // all characters returned here are "searched characters" filtering by predicate
             if allCharacters.isEmpty {
                 // call search api function
                 searchOnMarvel(with: typedName)
             }
-            
-            if !searchActive {
-                predicateForSearch = nil // if predicate here different from nil when going back from favorites view controller, character VC loads all characters, it doesn't matter true or false
-            }
-            
-            
-            
+
+            spinner.stopAnimating()
+            spinner.hidesWhenStopped = true
+
         }
         
         searchBar.searchTextField.text = "Tap cancel for all characters"
@@ -294,6 +307,7 @@ extension CharactersViewController: UISearchBarDelegate {
         }
     }
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchActive = true
         searchBar.isUserInteractionEnabled = true
         searchBar.setShowsCancelButton(true, animated: true)
     }
@@ -302,41 +316,47 @@ extension CharactersViewController: UISearchBarDelegate {
         
         let requestForSearch = APIRequest(offset: 0, nameStartsWith: name)
         
-        requestForSearch.fetchDataWrapper(with: requestForSearch.parameters) { response in
-            
-            if response.isEmpty {
+        requestForSearch.fetchCharacter() { response in
+            switch response {
                 
-                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
-                    let alertController = UIAlertController(title: "Oops!", message: "The character you requested is not available", preferredStyle: .alert)
-                    let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
-                        print("cancel tapped")
+            case .success(let data):
+                if data.isEmpty {
+                    
+                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+                        let alertController = UIAlertController(title: "Oops!", message: "The Character you requested is not available", preferredStyle: .alert)
+                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
+                            print("cancel tapped")
+                            
+                        }
+                        
+                        alertController.addAction(cancelAction)
+                        self.present(alertController, animated: true, completion: nil)
+                    }
+                    
+                }else {
+                    for character in data {
+                        guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while searching character") }
+                        
+                        let newCharacter = AllCharacter(context: self.context)
+                        newCharacter.id = Int64(searchedID)
+                        newCharacter.charName = searchedName
+                        newCharacter.isStarred = false
+                        newCharacter.charDescription = searchedDescription
+                        newCharacter.imgUrl = searchedURL
+                        newCharacter.searched = true  // searched character
+                        self.allCharacters.append(newCharacter)
+                        self.saveAllCharacters()
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
                         
                     }
                     
-                    alertController.addAction(cancelAction)
-                    self.present(alertController, animated: true, completion: nil)
                 }
-                
-            }else {
-                for character in response {
-                    guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while searching character") }
-                    
-                    let newCharacter = AllCharacter(context: self.context)
-                    newCharacter.id = Int64(searchedID)
-                    newCharacter.charName = searchedName
-                    newCharacter.isStarred = false
-                    newCharacter.charDescription = searchedDescription
-                    newCharacter.imageURL = searchedURL
-                    newCharacter.searched = true  // searched character
-                    self.allCharacters.append(newCharacter)
-                    self.saveAllCharacters()
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
-                    
-                }
-                
+            case .failure(let error):
+                print(error)
             }
+            
             
         }
         
@@ -348,7 +368,6 @@ extension CharactersViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        
         return allCharacters.count
         
     }
@@ -357,7 +376,7 @@ extension CharactersViewController: UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell", for: indexPath) as! CharacterTableViewCell
         
         cell.delegate = self
-        cell.marvelCharacter = allCharacters[indexPath.row]
+        cell.character = allCharacters[indexPath.row]
         
         return cell
         
@@ -373,24 +392,20 @@ extension CharactersViewController: UITableViewDelegate {
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
         
-        guard let character = cell.marvelCharacter else {return print("error")}
-        destinationVC.charLargeImage = cell.charImage // Due to the size of image different, I take image from cell
+    
+        let character = cell.character
+        destinationVC.charLargeImage = cell.charImage // Because the size of image is different, I take image from cell
+        destinationVC.characterID = Int(character.id)
         destinationVC.charName = character.charName
         destinationVC.charDescription = character.charDescription
-        
-        
-        
+
+        let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
+        destinationVC.urlForComics = comicUrl
         navigationController?.pushViewController(destinationVC, animated: true)
-        
-        print(character.id)
-        
     }
     
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
         let rowHeight : CGFloat = 85.0
-        
         return rowHeight
     }
     
@@ -403,9 +418,7 @@ extension CharactersViewController: UITableViewDelegate {
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
             spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
-            
             tableView.tableFooterView = spinner
-            
             tableView.tableFooterView?.isHidden = false
             
         }
@@ -440,7 +453,7 @@ extension CharactersViewController: CharacterCellDelegate {
     func accessoryViewDidTapped(cell: CharacterTableViewCell, isStarred: Bool) {
         
         //      guard let indexPath = tableView.indexPath(for: cell) else {return print("error while tapping cell")}
-        cell.marvelCharacter?.isStarred = isStarred
+        cell.character.isStarred = isStarred
         cell.accessoryImageView.tintColor = cell.accessoryIsTapped ? .orange : .gray
         
         saveAllCharacters()

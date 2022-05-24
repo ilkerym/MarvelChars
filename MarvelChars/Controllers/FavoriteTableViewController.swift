@@ -88,7 +88,7 @@ class FavoriteTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return  favorites.isEmpty ? 1 : favorites.count
+        return  favorites.count
     }
 
     
@@ -96,12 +96,8 @@ class FavoriteTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "favoriteCell", for: indexPath) as! FavoriteTableViewCell
         cell.delegate = self
         // Configure the cell...
-        
-        
-        if !favorites.isEmpty {
-            cell.favoriteCharacter = favorites[indexPath.row]
-        }
-      
+
+         cell.favoriteCharacter = favorites[indexPath.row]
 
         return cell
     }
@@ -120,13 +116,13 @@ class FavoriteTableViewController: UITableViewController {
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
         
         guard let character = cell.favoriteCharacter else {return print("error")}
-//        if let comics = data.character.comics?.items {
-//            destinationVC.comicsSummary = comics
-//        }
-        // buradan devam favorilerden git.
+
         destinationVC.charLargeImage = cell.charImage
         destinationVC.charName = character.charName
         destinationVC.charDescription = character.charDescription
+        
+        let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
+        destinationVC.urlForComics = comicUrl
         navigationController?.pushViewController(destinationVC, animated: true)
     }
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -138,19 +134,15 @@ class FavoriteTableViewController: UITableViewController {
             // Delete the row from the data source
             favorites[indexPath.row].isStarred = false
             saveFavorites()
+           
             favorites.remove(at: indexPath.row)
+            
             tableView.deleteRows(at: [indexPath], with: .fade)
-
             
 
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
 
-
-
-//            let add = MarvelCharacter(id: 0, nameOfCharacter: "ilker", characterImageURL: "", description: "anything", character: Character())
-//            favorites.append(add)
-//            tableView.insertRows(at: [indexPath], with: .right)
         }
     }
     
@@ -159,12 +151,7 @@ class FavoriteTableViewController: UITableViewController {
 }
 extension FavoriteTableViewController : FavoriteCellDelegate {
     func accessoryViewDidTapped(cell: FavoriteTableViewCell, isStarred: Bool) {
-        
-        
-        
-       // cell.favoriteCharacter?.isStarred = isStarred
-        
-      //  cell.accessoryImageView.tintColor = cell.accessoryIsTapped ? .orange : .gray
+
         
         guard let character = cell.favoriteCharacter else {return print("error while unwrapping cell character")}
     
@@ -180,18 +167,11 @@ extension FavoriteTableViewController : FavoriteCellDelegate {
                 character.isStarred = false
                 self.saveFavorites()
                 self.favorites.remove(object: character)
-                
-                
-               
-                //self.context.delete(character)
-                
-                //self.favoriteTableView.reloadData()
-                
-                // User Interface side
-                if let indexPath = self.favoriteTableView.indexPath(for: cell) {
+
+                    // User Interface side
+                    if let indexPath = self.favoriteTableView.indexPath(for: cell) {
                     self.favoriteTableView.deleteRows(at: [indexPath], with: .top)
-                }
-               
+                    }
                 
             }
             alert.addAction(cancelAction)

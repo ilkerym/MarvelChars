@@ -20,7 +20,7 @@ class CharacterTableViewCell: UITableViewCell {
     
     var delegate: CharacterCellDelegate?
     
-    var marvelCharacter : AllCharacter?
+    var character = AllCharacter()
     var charImage = UIImage()
     var accessoryIsTapped  = false
     var accessoryImageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 27 , height: 27))
@@ -31,16 +31,15 @@ class CharacterTableViewCell: UITableViewCell {
     override func updateConfiguration(using state: UICellConfigurationState) {
         super.updateConfiguration(using: state)
        
-        
-        
-        if  let character = marvelCharacter {
-            guard let url = character.imageURL else {return print("error image URL")}
+
+//            guard let urlForImage = character.imgUrl else {return print("error image URL")}
+        if let urlForImage = character.imgUrl {
             // Image Response Serializers
-            AF.request(url).responseImage { response in
+            AF.request(urlForImage).responseImage { response in
                 
-                guard let data = response.data else {return print("error while fetching character image")}
+                guard let imageData = response.data else {return print("error while fetching character image")}
                
-                self.charImage = UIImage(data: data) ?? UIImage(systemName: "photo")!
+                self.charImage = UIImage(data: imageData) ?? UIImage(systemName: "photo")!
                 
                 //apply image filter
                 let size = CGSize(width: 85.0, height: 85.0)
@@ -51,40 +50,17 @@ class CharacterTableViewCell: UITableViewCell {
                 
                 var content = self.defaultContentConfiguration().updated(for: state)
 
-                content.image = filteredCharImage 
+                content.image = filteredCharImage
                 
-                content.text = character.charName
+                content.text = self.character.charName
                 
                 self.contentConfiguration = content
                 
             }
         }
-//        else {
-//            guard let character = searchedCharacter else {return print("search population error")}
-//            AF.request(character.imageURL).responseImage { response in
-//
-//                guard let data = response.data else {return print("error while fetching character image")}
-//
-//                self.charImage = UIImage(data: data) ?? UIImage(systemName: "photo")!
-//
-//                //apply image filter
-//                let size = CGSize(width: 85.0, height: 85.0)
-//
-//                let imageFilter = AspectScaledToFillSizeWithRoundedCornersFilter(size: size, radius: 5)
-//
-//                let filteredCharImage = imageFilter.filter(self.charImage)
-//
-//                var content = self.defaultContentConfiguration().updated(for: state)
-//
-//                content.image = filteredCharImage
-//
-//                content.text = character.name
-//
-//                self.contentConfiguration = content
-//
-//            }
-            
-//        }
+         
+        
+
         
         accessoryImageView.image = starFillImage
         accessoryImageView.isUserInteractionEnabled = true
@@ -94,8 +70,8 @@ class CharacterTableViewCell: UITableViewCell {
         
         accessoryImageView.addGestureRecognizer(gestureRecognizer)
         
-        guard let characterInManager = marvelCharacter else {return print("error while updating, marking cell star")}
-        accessoryImageView.tintColor = characterInManager.isStarred ? .orange : .gray
+       // guard let characterInManager = character else {return print("error while updating, marking cell star")}
+        accessoryImageView.tintColor = character.isStarred ? .orange : .gray
        
     }
   
@@ -109,10 +85,8 @@ class CharacterTableViewCell: UITableViewCell {
     }
     @objc func cellTapped() {
         
-        
         delegate?.cellDidTapped(cell: self)
         
-
     }
 
 }

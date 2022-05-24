@@ -7,6 +7,7 @@
 
 import Foundation
 
+
 extension ComicList {
     var urlComics: String? {
         if let path = collectionURI   {
@@ -28,21 +29,21 @@ extension Image {
         
     }
 }
-extension Character {
-    
-    init(from decoder: Decoder) throws {
-        let values = try decoder.container(keyedBy: CodingKeys.self)
-        id = try values.decode(Int?.self, forKey: .id)
-        name = try values.decode(String?.self, forKey: .name)
-        description = try values.decode(String?.self, forKey: .description)
-        resourceURI = try values.decode(String?.self, forKey: .resourceURI)
-        thumbnail = try values.decode(Image?.self, forKey: .thumbnail)
-        comics = try values.decode(ComicList?.self, forKey: .comics)
-        urls = try values.decode([Url]? .self, forKey: .urls)
-        
-    }
-    
-}
+//extension Character {
+//    
+//    init(from decoder: Decoder) throws {
+//        let values = try decoder.container(keyedBy: CodingKeys.self)
+//        id = try values.decode(Int?.self, forKey: .id)
+//        name = try values.decode(String?.self, forKey: .name)
+//        description = try values.decode(String?.self, forKey: .description)
+//        resourceURI = try values.decode(String?.self, forKey: .resourceURI)
+//        thumbnail = try values.decode(Image?.self, forKey: .thumbnail)
+//        comics = try values.decode(ComicList?.self, forKey: .comics)
+//        urls = try values.decode([Url]? .self, forKey: .urls)
+//        
+//    }
+//    
+//}
 extension Image {
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
@@ -81,3 +82,22 @@ extension Sequence where Element: Hashable {
         return filter { set.insert($0).inserted }
     }
 }
+extension Date {
+    func getDateString() -> String {
+        let components = Calendar.current.dateComponents([.day, .month, .year, .hour, .minute, .second, .nanosecond], from: self)
+        let day = components.day!
+        let month = components.month!
+        let year = components.year!
+        if month < 10 {
+            return "\(year)-0\(month)-\(day)"
+        }else {
+            return "\(year)-\(month)-\(day)"
+        }
+    }
+}
+//extension UserDefaults {
+//    func set<T>(object: T, forKey key: String, usingEncoder encoder: JSONEncoder = JSONEncoder()) where T : Decodable, T : Encodable {
+//
+//    }
+//
+//}
