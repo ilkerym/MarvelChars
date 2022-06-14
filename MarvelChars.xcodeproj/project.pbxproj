@@ -13,7 +13,6 @@
 		C214F6782832D82C004CD77A /* ComicDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C214F6772832D82C004CD77A /* ComicDataModel.swift */; };
 		C2D1FEFE27C4934000FF8F79 /* DetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D1FEFD27C4934000FF8F79 /* DetailsViewController.swift */; };
 		C2D1FF0127C4985D00FF8F79 /* DetailsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2D1FF0027C4985D00FF8F79 /* DetailsTableViewCell.swift */; };
-		C2E1C4FF283D341B000A92E1 /* CharacterManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E1C4FE283D341B000A92E1 /* CharacterManager.swift */; };
 		C2E854442813EFA8002CAC7B /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E854432813EFA8002CAC7B /* Extensions.swift */; };
 		C2F3B74127C01F1100AA64A2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B74027C01F1100AA64A2 /* AppDelegate.swift */; };
 		C2F3B74327C01F1100AA64A2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B74227C01F1100AA64A2 /* SceneDelegate.swift */; };
@@ -23,7 +22,7 @@
 		C2F3B74D27C01F1100AA64A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C2F3B74C27C01F1100AA64A2 /* Assets.xcassets */; };
 		C2F3B75027C01F1100AA64A2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C2F3B74E27C01F1100AA64A2 /* LaunchScreen.storyboard */; };
 		C2F3B75827C0313F00AA64A2 /* CharacterDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75727C0313F00AA64A2 /* CharacterDataModel.swift */; };
-		C2F3B75C27C1322B00AA64A2 /* APIRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75B27C1322B00AA64A2 /* APIRequest.swift */; };
+		C2F3B75C27C1322B00AA64A2 /* ApiRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2F3B75B27C1322B00AA64A2 /* ApiRequest.swift */; };
 		C2FD6C5B28182CC300ABC21D /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FD6C5A28182CC300ABC21D /* MainViewController.swift */; };
 		C2FD6C5D28182CF500ABC21D /* MainTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FD6C5C28182CF500ABC21D /* MainTableViewCell.swift */; };
 		C2FD6C5F2818331200ABC21D /* FavoriteTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2FD6C5E2818331200ABC21D /* FavoriteTableViewCell.swift */; };
@@ -52,7 +51,6 @@
 		C214F6772832D82C004CD77A /* ComicDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComicDataModel.swift; sourceTree = "<group>"; };
 		C2D1FEFD27C4934000FF8F79 /* DetailsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsViewController.swift; sourceTree = "<group>"; };
 		C2D1FF0027C4985D00FF8F79 /* DetailsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailsTableViewCell.swift; sourceTree = "<group>"; };
-		C2E1C4FE283D341B000A92E1 /* CharacterManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterManager.swift; sourceTree = "<group>"; };
 		C2E854432813EFA8002CAC7B /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C2F3B73D27C01F1100AA64A2 /* MarvelChars.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarvelChars.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2F3B74027C01F1100AA64A2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -64,7 +62,7 @@
 		C2F3B74F27C01F1100AA64A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C2F3B75127C01F1100AA64A2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C2F3B75727C0313F00AA64A2 /* CharacterDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterDataModel.swift; sourceTree = "<group>"; };
-		C2F3B75B27C1322B00AA64A2 /* APIRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIRequest.swift; sourceTree = "<group>"; };
+		C2F3B75B27C1322B00AA64A2 /* ApiRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiRequest.swift; sourceTree = "<group>"; };
 		C2FD6C5A28182CC300ABC21D /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C2FD6C5C28182CF500ABC21D /* MainTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewCell.swift; sourceTree = "<group>"; };
 		C2FD6C5E2818331200ABC21D /* FavoriteTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteTableViewCell.swift; sourceTree = "<group>"; };
@@ -105,8 +103,7 @@
 			children = (
 				C2F3B75727C0313F00AA64A2 /* CharacterDataModel.swift */,
 				C214F6772832D82C004CD77A /* ComicDataModel.swift */,
-				C2E1C4FE283D341B000A92E1 /* CharacterManager.swift */,
-				C2F3B75B27C1322B00AA64A2 /* APIRequest.swift */,
+				C2F3B75B27C1322B00AA64A2 /* ApiRequest.swift */,
 				C2E854432813EFA8002CAC7B /* Extensions.swift */,
 			);
 			path = Model;
@@ -294,9 +291,8 @@
 				C2FD6C5F2818331200ABC21D /* FavoriteTableViewCell.swift in Sources */,
 				C214F6782832D82C004CD77A /* ComicDataModel.swift in Sources */,
 				C2F3B74527C01F1100AA64A2 /* CharactersViewController.swift in Sources */,
-				C2E1C4FF283D341B000A92E1 /* CharacterManager.swift in Sources */,
 				C2F3B75827C0313F00AA64A2 /* CharacterDataModel.swift in Sources */,
-				C2F3B75C27C1322B00AA64A2 /* APIRequest.swift in Sources */,
+				C2F3B75C27C1322B00AA64A2 /* ApiRequest.swift in Sources */,
 				C2F3B74127C01F1100AA64A2 /* AppDelegate.swift in Sources */,
 				C2D1FF0127C4985D00FF8F79 /* DetailsTableViewCell.swift in Sources */,
 				C2E854442813EFA8002CAC7B /* Extensions.swift in Sources */,

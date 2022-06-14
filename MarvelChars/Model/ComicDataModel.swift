@@ -26,14 +26,14 @@ struct DataClass: Codable {
 struct Comic: Codable {
     let id, digitalID: Int?
     let title: String?
-    let issueNumber: Int?
+    
     let variantDescription, resultDescription: String?
     let modified: Date?
     let isbn, upc, diamondCode, ean: String?
     
   
     let pageCount: Int?
-    let textObjects: [TextObject]?
+  
     let resourceURI: String?
     let urls: [URLElement]?
     let series: Series?
@@ -52,9 +52,9 @@ struct Comic: Codable {
     enum CodingKeys: String, CodingKey {
         case id
         case digitalID = "digitalId"
-        case title, issueNumber, variantDescription
+        case title, variantDescription
         case resultDescription = "description"
-        case modified, isbn, upc, diamondCode, ean, pageCount, textObjects, resourceURI, urls, series, variants, collections, collectedIssues, dates, prices, thumbnail, images, creators, characters, events
+        case modified, isbn, upc, diamondCode, ean, pageCount,  resourceURI, urls, series, variants, collections, collectedIssues, dates, prices, thumbnail, images, creators, characters, events
     }
 }
 

@@ -20,7 +20,7 @@ class CharactersViewController: UIViewController{
     
     //parameter definitions
     private var character = [Character]()
-    private let charRequest = APIRequest(offset: 0), newCharRequest = APIRequest(offset: 30)
+    private let charRequest = ApiRequest(offset: 0), newCharRequest = ApiRequest(offset: 30)
     private let activityIndicator = UIActivityIndicatorView()
     private var isPaginating = false
     private var searchActive = false
@@ -29,9 +29,9 @@ class CharactersViewController: UIViewController{
     
     static var favoriteCharacters = [AllCharacter]()
     
-    private var favorite = AllCharacter()
+    private var favorite : AllCharacter?
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    public let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     private let request : NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest()
     private var predicateForSearchOn : NSPredicate? = nil
@@ -39,7 +39,7 @@ class CharactersViewController: UIViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+       // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         tableView.register(CharacterTableViewCell.self, forCellReuseIdentifier: "characterCell")
         
@@ -52,41 +52,29 @@ class CharactersViewController: UIViewController{
         
         // initialize UI
         setSearchBarAppearance()
-        
         //Read from Database
         loadAllCharacters()
-        
         if allCharacters.isEmpty {
             showSpinner()
             networkRequest(pagination: false)
         }
-        
-        
-        
-        
+  
     }
     override func viewWillAppear(_ animated: Bool) {
-        print("viewWillappear called")
+        
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Favorites", style: .plain, target: self, action: #selector(goFavorite))
         navigationItem.rightBarButtonItem?.tintColor = .systemRed
         
         if !searchActive {
-            predicateForSearchOn = nil // if predicate here is different from nil, by the time going back from favorites view controller, character VC loads all characters, it doesn't matter that characters are true or false
+            predicateForSearchOn = nil // if predicate here is different from nil, by the time going back from favorites view controller, character VC loads all characters, it doesn't matter that characters are favorites or not
             loadAllCharacters()
         } else {
-          
             loadAllCharacters(with: request, predicate: predicateForSearchOn)
         }
         
         
     }
-    override func viewDidAppear(_ animated: Bool) {
-        print("viewdidappear called")
-        
-        
-    }
-    
-    
+
     @objc func goFavorite() {
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "FavoriteTableViewController") as! FavoriteTableViewController
@@ -117,7 +105,7 @@ class CharactersViewController: UIViewController{
     
     private func removeSpinner() {
         activityIndicator.stopAnimating()
-        activityIndicator.removeFromSuperview()
+        activityIndicator.hidesWhenStopped = true
     }
     // API request function
     private func networkRequest(pagination: Bool) {
@@ -174,17 +162,12 @@ class CharactersViewController: UIViewController{
                 newCharacter.charDescription = description
                 newCharacter.searched = false
                 allCharacters.append(newCharacter)
-                
                 saveAllCharacters()
-                
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                 }
-                
             }
-            
         }
-        
     }
     //MARK: - CRUD Functions
     
@@ -216,14 +199,9 @@ class CharactersViewController: UIViewController{
             print("default workss")
             request.predicate = predicateForSearchOff
         }
-        
-        
        // request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
-
         do {
-            
             allCharacters =  try context.fetch(request)
-            
         } catch {
             print("error occurred while loading all characters to UI, error definition \(error)")
         }
@@ -239,34 +217,17 @@ extension CharactersViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         searchActive = true
-        let spinner = UIActivityIndicatorView(style: .medium)
-        spinner.color = .black
-        
-        DispatchQueue.main.async {
-            self.tableView.backgroundView = spinner
-            spinner.startAnimating()
-        }
-        
-        
-       
+
         if let typedName = searchBar.searchTextField.text {
 
             predicateForSearchOn = NSPredicate(format: "charName  BEGINSWITH[c]  %@", typedName)
-
             loadAllCharacters(with: request, predicate: predicateForSearchOn)
-            print("returnedAllCharacter.count---\(allCharacters.count)")
-            
-            // all characters returned here are "searched characters" filtering by predicate
+            // all characters returned here are "searched characters" filtered by predicate
             if allCharacters.isEmpty {
                 // call search api function
                 searchOnMarvel(with: typedName)
             }
-
-            spinner.stopAnimating()
-            spinner.hidesWhenStopped = true
-
         }
-        
         searchBar.searchTextField.text = "Tap cancel for all characters"
         searchBar.setShowsCancelButton(true, animated: true)
         searchBar.tintColor = .clear
@@ -275,35 +236,26 @@ extension CharactersViewController: UISearchBarDelegate {
         
     }
     func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
-        
         searchBar.tintColor = .darkGray
-        
         return true
-        
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         searchBar.setShowsCancelButton(true, animated: true)
         searchBar.tintColor = .darkGray
-        
     }
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        
         searchBar.text = ""
         searchBar.tintColor = .clear
         searchBar.endEditing(true)
         searchBar.setShowsCancelButton(false, animated: true)
         searchActive = false
         loadAllCharacters()
-        
-        
     }
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
         if searchBar.searchTextField.text != "" {
-            
         } else {
             searchBar.placeholder = "Search Character"
-            
         }
     }
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
@@ -313,29 +265,23 @@ extension CharactersViewController: UISearchBarDelegate {
     }
     
     func searchOnMarvel(with name: String) {
-        
-        let requestForSearch = APIRequest(offset: 0, nameStartsWith: name)
-        
+        let requestForSearch = ApiRequest(offset: 0, nameStartsWith: name)
         requestForSearch.fetchCharacter() { response in
             switch response {
-                
             case .success(let data):
                 if data.isEmpty {
-                    
                     DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
                         let alertController = UIAlertController(title: "Oops!", message: "The Character you requested is not available", preferredStyle: .alert)
                         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
                             print("cancel tapped")
-                            
                         }
-                        
                         alertController.addAction(cancelAction)
                         self.present(alertController, animated: true, completion: nil)
                     }
                     
                 }else {
                     for character in data {
-                        guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while searching character") }
+                        guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while unwrapping searching character") }
                         
                         let newCharacter = AllCharacter(context: self.context)
                         newCharacter.id = Int64(searchedID)
@@ -349,37 +295,25 @@ extension CharactersViewController: UISearchBarDelegate {
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
                         }
-                        
                     }
-                    
                 }
             case .failure(let error):
                 print(error)
             }
-            
-            
         }
-        
     }
-    
 }
 // MARK: - TableView Data Source Methods
 extension CharactersViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
         return allCharacters.count
-        
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
         let cell = tableView.dequeueReusableCell(withIdentifier: "characterCell", for: indexPath) as! CharacterTableViewCell
-        
         cell.delegate = self
         cell.character = allCharacters[indexPath.row]
-        
         return cell
-        
     }
 }
 //MARK: - TableView Delegate Methods
@@ -387,82 +321,63 @@ extension CharactersViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        
         guard  let  cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {return}
-        
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
-        
     
-        let character = cell.character
-        destinationVC.charLargeImage = cell.charImage // Because the size of image is different, I take image from cell
-        destinationVC.characterID = Int(character.id)
-        destinationVC.charName = character.charName
-        destinationVC.charDescription = character.charDescription
-
-        let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
-        destinationVC.urlForComics = comicUrl
+        if let character = cell.character {
+            destinationVC.charLargeImage = cell.charImageView.image // Because the size of image is different, I take image from cell
+            destinationVC.characterId = Int(character.id)
+            destinationVC.charName = character.charName
+            destinationVC.charDescription = character.charDescription
+            let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
+            destinationVC.urlForComics = comicUrl
+        }
         navigationController?.pushViewController(destinationVC, animated: true)
     }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         let rowHeight : CGFloat = 85.0
         return rowHeight
     }
-    
-    // Adding spinner while fetching data when reaching at the end of tableview
+    // Add spinner while fetching data, by the time reaching at the end of the tableview
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let lastSectionIndex = tableView.numberOfSections - 1
         let lastRowIndex = tableView.numberOfRows(inSection: lastSectionIndex) - 1
         if (indexPath.section ==  lastSectionIndex) && (indexPath.row == lastRowIndex) {
-            
             let spinner = UIActivityIndicatorView(style: .medium)
             spinner.startAnimating()
             spinner.frame = CGRect(x: CGFloat(0), y: CGFloat(0), width: tableView.bounds.width, height: CGFloat(44))
             tableView.tableFooterView = spinner
             tableView.tableFooterView?.isHidden = false
-            
         }
     }
-    
 }
 //MARK: - ScrollView Delegate Functions
 extension CharactersViewController: UIScrollViewDelegate {
-    
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let position = scrollView.contentOffset.y
         if position > (tableView.contentSize.height - 50 - scrollView.frame.size.height) {
-            
             guard !isPaginating else {
                 // already fethcing data
                 return
             }
             networkRequest(pagination: true)
-            
         }
     }
-    
 }
 //MARK: - CharacterCell Delegate Functions
 extension CharactersViewController: CharacterCellDelegate {
-    
-    
     func cellDidTapped(cell: CharacterTableViewCell) {
         // guard let indexPath = tableView.indexPath(for: cell) else {return}
-        
     }
     func accessoryViewDidTapped(cell: CharacterTableViewCell, isStarred: Bool) {
-        
-        //      guard let indexPath = tableView.indexPath(for: cell) else {return print("error while tapping cell")}
-        cell.character.isStarred = isStarred
-        cell.accessoryImageView.tintColor = cell.accessoryIsTapped ? .orange : .gray
-        
-        saveAllCharacters()
+        // guard let indexPath = tableView.indexPath(for: cell) else {return print("error while tapping cell")}
+        if let character = cell.character {
+            character.isStarred = isStarred
+        }
+        cell.accessoryView?.tintColor = cell.accessoryIsTapped ? .orange : .gray
         CharactersViewController.favoriteCharacters = allCharacters.filter{ $0.isStarred == true}
-        
-        
-        
+        saveAllCharacters()
     }
-    
 }
 
 
