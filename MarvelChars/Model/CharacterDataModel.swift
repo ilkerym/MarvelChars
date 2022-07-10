@@ -32,14 +32,12 @@ struct Character : Codable {
     var urls: [Url]? // (Array[Url], optional): A set of public web site URLs for the resource.,
     var thumbnail: Image? //(Image, optional): The representative image for this character.,
     var comics: ComicList? // (ComicList, optional): A resource list containing comics which feature this character.,
-    var stories: StoryList? //(StoryList, optional): A resource list of stories in which this character appears.,
-    var events: EventList?// (EventList, optional): A resource list of events in which this character appears.,
-    var series: SeriesList? //(SeriesList, optional): A resource list of series in which this character appears.
+
     
     enum CodingKeys: String, CodingKey {
         case id, name
         case description = "description"
-        case modified, resourceURI, urls, thumbnail, comics, stories, events, series
+        case modified, resourceURI, urls, thumbnail, comics
     }
     
 }
@@ -67,37 +65,10 @@ struct ComicSummary : Codable  {
     let resourceURI: String? //(string, optional): The path to the individual comic resource.,
     let name:String? //(string, optional): The canonical name of the comic.
 }
-struct StoryList : Codable  {
-    let available:Int? //(int, optional): The number of total available stories in this list. Will always be greater than or equal to the "returned" value.,
-    let returned:Int? //(int, optional): The number of stories returned in this collection (up to 20).,
-    let collectionURI:String? // (string, optional): The path to the full list of stories in this collection.,
-    let items: [StorySummary]? //(Array[StorySummary], optional): The list of returned stories in this collection.
-}
-struct StorySummary : Codable  {
-    let resourceURI : String? //(string, optional): The path to the individual story resource.,
-    let name : String? //(string, optional): The canonical name of the story.,
-    let type : String? //(string, optional): The type of the story (interior or cover).
-}
-struct EventList : Codable  {
-    let available : Int? //(int, optional): The number of total available events in this list. Will always be greater than or equal to the "returned" value.,
-    let returned : Int? //(int, optional): The number of events returned in this collection (up to 20).,
-    let collectionURI : String? // (string, optional): The path to the full list of events in this collection.,
-    let items : [EventSummary]? // (Array[EventSummary], optional): The list of returned events in this collection.
-}
-struct EventSummary : Codable  {
-    let resourceURI: String? // (string, optional): The path to the individual event resource.,
-    let name: String? // (string, optional): The name of the event.
-}
-struct SeriesList : Codable {
-    let available : Int? // (int, optional): The number of total available series in this list. Will always be greater than or equal to the "returned" value.,
-    let returned:Int? //(int, optional): The number of series returned in this collection (up to 20).,
-    let collectionURI:String? //(string, optional): The path to the full list of series in this collection.,
-    let items: [SeriesSummary]? //(Array[SeriesSummary], optional): The list of returned series in this collection.
-}
-struct SeriesSummary : Codable  {
-    let resourceURI : String? //(string, optional): The path to the individual series resource.,
-    let name: String? //(string, optional): The canonical name of the series.
-}
+
+
+
+
 
 
 

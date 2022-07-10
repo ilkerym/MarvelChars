@@ -81,7 +81,7 @@ class FavoriteTableViewController: UITableViewController {
         destinationVC.charDescription = character.charDescription
         
         let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
-        destinationVC.urlForComics = comicUrl
+        destinationVC.comicUrl = comicUrl
         navigationController?.pushViewController(destinationVC, animated: true)
     }
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {

@@ -20,26 +20,22 @@ class CharactersViewController: UIViewController{
     
     //parameter definitions
     private var character = [Character]()
-    private let charRequest = ApiRequest(offset: 0), newCharRequest = ApiRequest(offset: 30)
+    private let fetchCharacter = APIRequest(offset: 0), fetchNewCharacter = APIRequest(offset: 30)
     private let activityIndicator = UIActivityIndicatorView()
     private var isPaginating = false
     private var searchActive = false
     private var allCharacters = [AllCharacter]()
     private var searchedCharacter = [AllCharacter]()
-    
     static var favoriteCharacters = [AllCharacter]()
-    
     private var favorite : AllCharacter?
-    
     public let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     private let request : NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest()
     private var predicateForSearchOn : NSPredicate? = nil
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-       // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        // print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
         tableView.register(CharacterTableViewCell.self, forCellReuseIdentifier: "characterCell")
         
@@ -58,7 +54,6 @@ class CharactersViewController: UIViewController{
             showSpinner()
             networkRequest(pagination: false)
         }
-  
     }
     override func viewWillAppear(_ animated: Bool) {
         
@@ -74,7 +69,7 @@ class CharactersViewController: UIViewController{
         
         
     }
-
+    
     @objc func goFavorite() {
         
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "FavoriteTableViewController") as! FavoriteTableViewController
@@ -114,46 +109,66 @@ class CharactersViewController: UIViewController{
             if pagination {
                 isPaginating = true
             }
-            newCharRequest.fetchCharacter() { response in
+            //            fetchNewCharacter.fetchDatas(Url: fetchNewCharacter.baseUrl, parameters: fetchNewCharacter.parametersForCharacter, onComplete: { response as! [Character]  in
+            //
+            //                    switch response  {
+            //
+            //                    case .success(let data):
+            //                        self.configureAllCharacters(with: data)
+            //                        self.newCharRequest.offset += 30
+            //                        self.isPaginating = false
+            //                    case .failure(let error):
+            //                        print(error)
+            //                    }}
+            
+            fetchNewCharacter.fetchDatas(Url: fetchNewCharacter.baseUrl, parameters: fetchNewCharacter.characterParameters) { [self] response  in
                 switch response {
                     
                 case .success(let data):
-                    self.configureAllCharacters(with: data)
-                    self.newCharRequest.offset += 30
-                    self.isPaginating = false
+                    configureAllCharacters(with: data as! [Character])
+                    fetchNewCharacter.offset += 30
+                    isPaginating = false
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
-  
             }
+            
         }
         else {
-            charRequest.fetchCharacter() { response in
-                print("charRequest.offset\(self.charRequest.offset)")
+            
+            fetchCharacter.fetchDatas(Url: fetchCharacter.baseUrl, parameters: fetchCharacter.characterParameters) { [self] response in
                 switch response {
                     
                 case .success(let data):
-                    self.configureAllCharacters(with: data)
+                    configureAllCharacters(with: data as! [Character])
                     DispatchQueue.main.async {
                         self.removeSpinner()
-                        // self.tableView.reloadData()
                     }
                 case .failure(let error):
-                    print(error)
+                    print(error.localizedDescription)
                 }
-                
-                
             }
-        }
-        
-        
-    }
-    func configureAllCharacters(with characters: [Character]) {
-        
-        for item in characters {
             
+            //            fetchCharacter.fetchCharacter() { response in
+            //                print("charRequest.offset\(self.fetchCharacter.offset)")
+            //                switch response {
+            //
+            //                case .success(let data):
+            //                    self.configureAllCharacters(with: data)
+            //                    DispatchQueue.main.async {
+            //                        self.removeSpinner()
+            //                        // self.tableView.reloadData()
+            //                    }
+            //                case .failure(let error):
+            //                    print(error)
+            //                }
+            //
+            //            }
+        }
+    }
+    func configureAllCharacters(with items: [Character]) {
+        for item in items {
             if let id = item.id, let name = item.name, let imageUrl = item.thumbnail?.url, let description = item.description {
-                
                 let newCharacter = AllCharacter(context: self.context)
                 newCharacter.id = Int64(id)
                 newCharacter.charName = name
@@ -184,7 +199,7 @@ class CharactersViewController: UIViewController{
         
         
     }
-
+    
     // READ from DB
     func loadAllCharacters(with request: NSFetchRequest<AllCharacter> = AllCharacter.fetchRequest(), predicate : NSPredicate? = nil) {
         
@@ -199,7 +214,7 @@ class CharactersViewController: UIViewController{
             print("default workss")
             request.predicate = predicateForSearchOff
         }
-       // request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
+        // request.sortDescriptors = [NSSortDescriptor(key: "charName", ascending: true)]
         do {
             allCharacters =  try context.fetch(request)
         } catch {
@@ -217,9 +232,9 @@ extension CharactersViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         searchActive = true
-
+        
         if let typedName = searchBar.searchTextField.text {
-
+            
             predicateForSearchOn = NSPredicate(format: "charName  BEGINSWITH[c]  %@", typedName)
             loadAllCharacters(with: request, predicate: predicateForSearchOn)
             // all characters returned here are "searched characters" filtered by predicate
@@ -265,8 +280,10 @@ extension CharactersViewController: UISearchBarDelegate {
     }
     
     func searchOnMarvel(with name: String) {
-        let requestForSearch = ApiRequest(offset: 0, nameStartsWith: name)
-        requestForSearch.fetchCharacter() { response in
+        let requestForSearch = APIRequest(offset: 0, nameStartsWith: name)
+        //   requestForSearch.fetchCharacter() { response in
+        
+        requestForSearch.fetchDatas(Url: requestForSearch.baseUrl, parameters: requestForSearch.characterParameters) { response in
             switch response {
             case .success(let data):
                 if data.isEmpty {
@@ -280,7 +297,7 @@ extension CharactersViewController: UISearchBarDelegate {
                     }
                     
                 }else {
-                    for character in data {
+                    for character in data as! [Character] {
                         guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while unwrapping searching character") }
                         
                         let newCharacter = AllCharacter(context: self.context)
@@ -298,9 +315,44 @@ extension CharactersViewController: UISearchBarDelegate {
                     }
                 }
             case .failure(let error):
-                print(error)
+                print(error.localizedDescription)
             }
         }
+        
+        //            switch response {
+        //            case .success(let data):
+        //                if data.isEmpty {
+        //                    DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.5) {
+        //                        let alertController = UIAlertController(title: "Oops!", message: "The Character you requested is not available", preferredStyle: .alert)
+        //                        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { action in
+        //                            print("cancel tapped")
+        //                        }
+        //                        alertController.addAction(cancelAction)
+        //                        self.present(alertController, animated: true, completion: nil)
+        //                    }
+        //
+        //                }else {
+        //                    for character in data {
+        //                        guard let searchedID = character.id, let searchedName = character.name, let searchedURL = character.thumbnail?.url, let searchedDescription = character.description  else {return print("error while unwrapping searching character") }
+        //
+        //                        let newCharacter = AllCharacter(context: self.context)
+        //                        newCharacter.id = Int64(searchedID)
+        //                        newCharacter.charName = searchedName
+        //                        newCharacter.isStarred = false
+        //                        newCharacter.charDescription = searchedDescription
+        //                        newCharacter.imgUrl = searchedURL
+        //                        newCharacter.searched = true  // searched character
+        //                        self.allCharacters.append(newCharacter)
+        //                        self.saveAllCharacters()
+        //                        DispatchQueue.main.async {
+        //                            self.tableView.reloadData()
+        //                        }
+        //                    }
+        //                }
+        //            case .failure(let error):
+        //                print(error)
+        //            }
+        
     }
 }
 // MARK: - TableView Data Source Methods
@@ -323,14 +375,14 @@ extension CharactersViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         guard  let  cell = tableView.cellForRow(at: indexPath) as? CharacterTableViewCell else {return}
         let destinationVC = storyboard?.instantiateViewController(withIdentifier: "DetailsViewController") as! DetailsViewController
-    
+        
         if let character = cell.character {
             destinationVC.charLargeImage = cell.charImageView.image // Because the size of image is different, I take image from cell
             destinationVC.characterId = Int(character.id)
             destinationVC.charName = character.charName
             destinationVC.charDescription = character.charDescription
             let comicUrl = "https://gateway.marvel.com/v1/public/characters/\(character.id)/comics"
-            destinationVC.urlForComics = comicUrl
+            destinationVC.comicUrl = comicUrl
         }
         navigationController?.pushViewController(destinationVC, animated: true)
     }

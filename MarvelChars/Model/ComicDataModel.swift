@@ -26,14 +26,10 @@ struct DataClass: Codable {
 struct Comic: Codable {
     let id, digitalID: Int?
     let title: String?
-    
     let variantDescription, resultDescription: String?
     let modified: Date?
     let isbn, upc, diamondCode, ean: String?
-    
-  
     let pageCount: Int?
-  
     let resourceURI: String?
     let urls: [URLElement]?
     let series: Series?
@@ -46,7 +42,6 @@ struct Comic: Codable {
     let images: [Thumbnail]?
     let creators: Creators?
     let characters: Characters?
-    
     let events: Characters?
 
     enum CodingKeys: String, CodingKey {

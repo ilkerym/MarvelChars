@@ -25,8 +25,8 @@ class DetailsViewController: UIViewController {
     var comicsSummary = [Comic]()
     var hiddenForTableViewCell = true
     var characterId = Int()
-    var urlForComics : String?
-    var requestForComic = ApiRequest(offset: 0)
+    var comicUrl : String?
+    var comicRequest = APIRequest(offset: 0)
     private let activityIndicator = UIActivityIndicatorView()
     
     override func viewDidLoad() {
@@ -48,25 +48,45 @@ class DetailsViewController: UIViewController {
         }
     }
     override func viewDidAppear(_ animated: Bool) {
-        guard let urlForComic = urlForComics else {return print("error")}
-        requestForComic.fetchComics(Url: urlForComic) { response in
+        guard let urlForComic = comicUrl else {return print("error")}
+        
+        comicRequest.fetchDatas(Url: urlForComic, parameters: comicRequest.comicParameters) { response in
             switch response {
+
             case .success(let data):
                 if data.isEmpty {
-                    self.hiddenForTableViewCell = false
-                } else {
-                    self.hiddenForTableViewCell = true
-                    self.comicsSummary = data
-                }
-                DispatchQueue.main.async {
-                    self.detailsTableView.reloadData()
-                    self.removeSpinner()
-                }
-                
+                                  self.hiddenForTableViewCell = false
+                              } else {
+                                  self.hiddenForTableViewCell = true
+                                  self.comicsSummary = data as! [Comic]
+                              }
+                              DispatchQueue.main.async {
+                                  self.detailsTableView.reloadData()
+                                  self.removeSpinner()
+                              }
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
+        
+//        comicRequest.fetchComics(Url: urlForComic) { response in
+//            switch response {
+//            case .success(let data):
+//                if data.isEmpty {
+//                    self.hiddenForTableViewCell = false
+//                } else {
+//                    self.hiddenForTableViewCell = true
+//                    self.comicsSummary = data
+//                }
+//                DispatchQueue.main.async {
+//                    self.detailsTableView.reloadData()
+//                    self.removeSpinner()
+//                }
+//
+//            case .failure(let error):
+//                print(error.localizedDescription)
+//            }
+//        }
     }
     private func initUI() {
         navigationItem.leftBarButtonItem?.tintColor = .black
