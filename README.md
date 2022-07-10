@@ -1,9 +1,8 @@
 # MarvelChars
 Marvel Characters App
-![AddFavorite](https://user-images.githubusercontent.com/92789549/173523846-cac1d47e-1398-4ad9-9589-547797bd86a5.gif)
-![InfiniteScroll](https://user-images.githubusercontent.com/92789549/173522934-325d9421-7584-4775-af57-3410684eebef.gif)
-![SearchCharacter](https://user-images.githubusercontent.com/92789549/173521469-8cfa9919-4c93-405e-838b-2e941785f2a6.gif)
-![AvailabilityMessage](https://user-images.githubusercontent.com/92789549/173521443-d482f602-18bb-4812-bc6a-cea1123ef177.gif)
-
+![AddFavorite](https://user-images.githubusercontent.com/92789549/178135517-90927c7e-e982-4942-9c81-5c8e4d6100b4.gif)
+![AvailabilityMessage](https://user-images.githubusercontent.com/92789549/178135525-624917f4-e12d-4740-a266-f85eb58a1954.gif)
+![InfiniteScroll](https://user-images.githubusercontent.com/92789549/178135526-549c2fa5-8942-4775-8aed-02d2b3bb18f1.gif)
+![SearchCharacter](https://user-images.githubusercontent.com/92789549/178135529-cba0d169-112b-468b-ac71-de6188c600fb.gif)
 
 
