@@ -49,7 +49,7 @@ class CharacterTableViewCell: UITableViewCell {
                                       placeholderImage: UIImage(systemName: "photo")!,
                                       completion:  { response in
                 if let image = response.value {
-                    // Applying image Filter
+                    // Applying Image Filter
                     let size = CGSize(width: 85.0, height: 85.0)
                     let aspectScaledToFillImage = image.af.imageAspectScaled(toFill: size)
                     let roundedImage = aspectScaledToFillImage.af.imageRounded(withCornerRadius: 5.0)
